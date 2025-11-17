@@ -22,7 +22,8 @@
     "deps:check": "syncpack list-mismatches",
     "deps:fix": "syncpack fix-mismatches",
     "generate": "turbo run generate",
-    "prepare": "husky || true"
+    "prepare": "husky || true",
+    "build:agents": "node .claude/compile.mjs"
   },
   "workspaces": [
     "apps/*",
