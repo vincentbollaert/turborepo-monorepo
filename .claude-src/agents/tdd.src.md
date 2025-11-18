@@ -21,6 +21,14 @@ You are a Test-Driven Development specialist. Your mission: write tests BEFORE i
 
 ---
 
+@include(../core prompts/anti-over-engineering.md)
+
+---
+
+@include(../skills/testing/src.md)
+
+---
+
 ## Your Investigation Process
 
 Before writing tests:
@@ -84,96 +92,6 @@ Before writing tests:
 - Confirm all tests failing (ready for implementation)
 - Specify expected patterns to follow
 </tdd_workflow>
-```
-
----
-
-## Test Structure Standards
-
-**Test File Organization:**
-
-```typescript
-// Component.test.tsx or function.test.ts
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { Component } from './Component'
-
-// Mock dependencies
-jest.mock('@/lib/api-client')
-
-describe('ProfileEditModal', () => {
-  const mockUser = {
-    id: '123',
-    name: 'John Doe',
-    email: 'john@example.com',
-    bio: 'Developer'
-  }
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  describe('rendering', () => {
-    it('shows modal with current user values', () => {
-      // Arrange
-      render(<ProfileEditModal user={mockUser} />)
-
-      // Assert
-      expect(screen.getByLabelText('Name')).toHaveValue('John Doe')
-      expect(screen.getByLabelText('Email')).toHaveValue('john@example.com')
-    })
-  })
-
-  describe('validation', () => {
-    it('shows error when email is invalid', async () => {
-      // Arrange
-      render(<ProfileEditModal user={mockUser} />)
-      const emailInput = screen.getByLabelText('Email')
-
-      // Act
-      await userEvent.clear(emailInput)
-      await userEvent.type(emailInput, 'invalid')
-      await userEvent.click(screen.getByRole('button', { name: 'Save' }))
-
-      // Assert
-      expect(await screen.findByText('Please enter a valid email')).toBeInTheDocument()
-    })
-  })
-
-  describe('submission', () => {
-    it('calls API with updated values on successful submission', async () => {
-      // Arrange
-      const mockUpdate = jest.fn().mockResolvedValue({ success: true })
-      apiClient.put.mockResolvedValue({ data: { ...mockUser, name: 'Jane' } })
-      render(<ProfileEditModal user={mockUser} onUpdate={mockUpdate} />)
-
-      // Act
-      await userEvent.clear(screen.getByLabelText('Name'))
-      await userEvent.type(screen.getByLabelText('Name'), 'Jane')
-      await userEvent.click(screen.getByRole('button', { name: 'Save' }))
-
-      // Assert
-      await waitFor(() => {
-        expect(apiClient.put).toHaveBeenCalledWith(
-          '/api/users/123',
-          expect.objectContaining({ name: 'Jane' })
-        )
-      })
-    })
-
-    it('shows error message on network failure', async () => {
-      // Arrange
-      apiClient.put.mockRejectedValue(new Error('Network error'))
-      render(<ProfileEditModal user={mockUser} />)
-
-      // Act
-      await userEvent.click(screen.getByRole('button', { name: 'Save' }))
-
-      // Assert
-      expect(await screen.findByText(/error updating profile/i)).toBeInTheDocument()
-    })
-  })
-})
 ```
 
 ---

@@ -1,6 +1,6 @@
 # Environment Management
 
-> **Quick Guide:** Per-app .env files (apps/client-next/.env). Framework-specific prefixes (NEXT_PUBLIC_*, VITE_*). Zod validation at startup. Maintain .env.example templates. Never commit secrets (.gitignore). Environment-based feature flags.
+> **Quick Guide:** Per-app .env files (apps/client-next/.env). Framework-specific prefixes (NEXT*PUBLIC*\_, VITE\_\_). Zod validation at startup. Maintain .env.example templates. Never commit secrets (.gitignore). Environment-based feature flags.
 
 **ACTUAL IMPLEMENTATION: Per-app `.env` files with Zod validation**
 
@@ -41,21 +41,25 @@ packages/
 **File types:**
 
 1. **`.env`** - Default development values (committed for apps, gitignored for sensitive packages)
+
    - Contains non-sensitive defaults
    - Used for local development
    - Framework-specific prefixes for client-side variables
 
 2. **`.env.example`** - Documentation template (committed)
+
    - Shows all required variables (no values)
    - Includes comments explaining each variable
    - Used for onboarding new developers
 
 3. **`.env.local`** - Local developer overrides (gitignored)
+
    - Personal development settings
    - Never committed
    - Takes precedence over `.env`
 
 4. **`.env.production`** - Production configuration (committed or in CI secrets)
+
    - Production-specific values (URLs, feature flags)
    - Sensitive values stored in CI secrets
    - Loaded during production builds
@@ -81,6 +85,7 @@ packages/
 4. `.env`
 
 **Best practice:**
+
 - Use `.env` for defaults (committed)
 - Use `.env.local` for personal overrides (gitignored)
 - Use `.env.production` for production config (committed or CI secrets)
@@ -94,8 +99,6 @@ Per-app prevents conflicts, clarifies ownership. Root-level causes shared variab
 
 **Exception:** Shared variables can go in `turbo.json` `env` array
 
-> See examples.md File Hierarchy section for implementation
-
 ---
 
 ## Naming Conventions
@@ -107,6 +110,7 @@ Per-app prevents conflicts, clarifies ownership. Root-level causes shared variab
 **Mandatory conventions:**
 
 1. **SCREAMING_SNAKE_CASE** - All environment variables must use uppercase with underscores
+
    ```bash
    # ✅ GOOD
    NEXT_PUBLIC_API_URL=https://api.example.com
@@ -118,6 +122,7 @@ Per-app prevents conflicts, clarifies ownership. Root-level causes shared variab
    ```
 
 2. **Descriptive names** - Variable names should clearly indicate purpose
+
    ```bash
    # ✅ GOOD
    NEXT_PUBLIC_API_URL=https://api.example.com
@@ -129,6 +134,7 @@ Per-app prevents conflicts, clarifies ownership. Root-level causes shared variab
    ```
 
 3. **Consistent prefixes** - Use framework prefixes for client-side variables
+
    ```bash
    # Next.js - NEXT_PUBLIC_*
    NEXT_PUBLIC_API_URL=https://api.example.com
@@ -144,6 +150,7 @@ Per-app prevents conflicts, clarifies ownership. Root-level causes shared variab
 **Next.js variables:**
 
 - **`NEXT_PUBLIC_*`** - Client-side accessible (embedded in bundle)
+
   - Use for: API URLs, public keys, feature flags
   - Avoid: Secrets, API keys, tokens
 
@@ -152,6 +159,7 @@ Per-app prevents conflicts, clarifies ownership. Root-level causes shared variab
   - Never exposed to client
 
 **Example:**
+
 ```bash
 # Client-side (embedded in JavaScript bundle)
 NEXT_PUBLIC_API_URL=https://api.example.com
@@ -165,6 +173,7 @@ API_SECRET_KEY=super-secret-key
 **Vite variables:**
 
 - **`VITE_*`** - Client-side accessible (embedded in bundle)
+
   - Use for: API URLs, public configuration
   - Avoid: Secrets
 
@@ -204,11 +213,10 @@ SENTRY_DSN=https://...
 ```
 
 **Benefits:**
+
 - Easier to find related variables
 - Clear separation of concerns
 - Easier to document
-
-> See examples.md Naming Conventions section for implementation
 
 ---
 
@@ -221,12 +229,14 @@ SENTRY_DSN=https://...
 **Pattern: Validate environment variables at startup with Zod**
 
 **Why validate:**
+
 - Catch missing variables early (at startup, not runtime)
 - Enforce correct types (URL, number, boolean, enum)
 - Provide helpful error messages
 - Single source of truth for environment schema
 
 **Benefits:**
+
 - ✅ Type safety (TypeScript knows variable types)
 - ✅ Runtime validation (fails fast with clear errors)
 - ✅ Default values (optional variables with defaults)
@@ -270,11 +280,10 @@ return schema.parse(env); // Throws cryptic Zod error
 ```
 
 **Benefits:**
+
 - Clear error messages for developers
 - Identifies exactly which variable is invalid
 - Suggests correct format
-
-> See examples.md Type-Safe Environment Variables section for implementation
 
 ---
 
@@ -325,6 +334,7 @@ SENTRY_DSN=
 ```
 
 **Template best practices:**
+
 - Group related variables
 - Include comments explaining purpose
 - Show example values
@@ -348,12 +358,11 @@ SENTRY_DSN=
    - Validation will catch missing required variables
 
 **Documentation:**
+
 - README should mention environment setup
 - Link to `.env.example` file
 - Document where to get third-party service keys
 - Include troubleshooting guide
-
-> See examples.md Environment File Templates section for implementation
 
 ---
 
@@ -364,6 +373,7 @@ SENTRY_DSN=
 ### Secret Management
 
 **What are secrets:**
+
 - API keys, tokens, passwords
 - Database credentials
 - Private keys, certificates
@@ -371,11 +381,13 @@ SENTRY_DSN=
 - Encryption keys
 
 **What NOT to commit:**
+
 - ❌ `.env.local` (local secrets)
 - ❌ `.env.production` with real secrets
 - ❌ Any file containing actual credentials
 
 **What to commit:**
+
 - ✅ `.env` with non-sensitive defaults
 - ✅ `.env.example` with placeholders
 - ✅ `.env.production` with variable names only (values in CI)
@@ -405,16 +417,19 @@ SENTRY_DSN=
 **Pattern: Store secrets in CI/CD platform**
 
 **GitHub Actions:**
+
 - Use GitHub Secrets (Settings → Secrets and variables → Actions)
 - Access via `${{ secrets.SECRET_NAME }}`
 - Secrets are encrypted and masked in logs
 
 **Vercel:**
+
 - Use Vercel Environment Variables (Project Settings → Environment Variables)
 - Separate values per environment (production, preview, development)
 - Access via CLI: `vercel env add VARIABLE_NAME production`
 
 **Best practices:**
+
 - Use different secrets per environment (staging vs production)
 - Rotate secrets regularly (quarterly minimum)
 - Use least-privilege access (separate secrets for each service)
@@ -424,11 +439,13 @@ SENTRY_DSN=
 ### Secret Rotation
 
 **Recommended rotation schedule:**
+
 - **Critical secrets** - Quarterly or on team member departure
 - **API keys** - Annually or on suspicious activity
 - **Passwords** - Every 90 days (or use OAuth)
 
 **Rotation process:**
+
 1. Generate new secret
 2. Add to CI/CD platform
 3. Deploy with new secret
@@ -445,11 +462,7 @@ SENTRY_DSN=
 {
   "tasks": {
     "build": {
-      "env": [
-        "NEXT_PUBLIC_API_URL",
-        "NODE_ENV",
-        "DATABASE_URL"
-      ]
+      "env": ["NEXT_PUBLIC_API_URL", "NODE_ENV", "DATABASE_URL"]
     }
   }
 }
@@ -470,11 +483,10 @@ SENTRY_DSN=
 ```
 
 **Why:**
+
 - Catches undeclared environment variables at lint time
 - Ensures variables are properly declared in turbo.json
 - Prevents accidental reliance on undeclared variables
-
-> See examples.md Security Best Practices section for implementation
 
 ---
 
@@ -494,6 +506,7 @@ NEXT_PUBLIC_FEATURE_AB_TEST=true
 ```
 
 **Usage:**
+
 ```typescript
 const FEATURES = {
   NEW_DASHBOARD: process.env.NEXT_PUBLIC_FEATURE_NEW_DASHBOARD === 'true',
@@ -508,12 +521,14 @@ if (FEATURES.NEW_DASHBOARD) {
 ```
 
 **Benefits:**
+
 - Simple to implement
 - No external dependencies
 - Works offline
 - Fast (no API calls)
 
 **Limitations:**
+
 - Requires rebuild to change flags
 - No gradual rollouts (0% or 100%)
 - No user targeting
@@ -524,6 +539,7 @@ if (FEATURES.NEW_DASHBOARD) {
 **When to use external service:**
 
 Use services like LaunchDarkly, PostHog, or Unleash when you need:
+
 - Runtime flag toggling (no deploys)
 - Gradual rollouts (5% → 25% → 50% → 100%)
 - User targeting (beta users, specific companies)
@@ -531,6 +547,7 @@ Use services like LaunchDarkly, PostHog, or Unleash when you need:
 - Scheduled releases
 
 **Trade-offs:**
+
 - ✅ No deploys needed to toggle flags
 - ✅ Gradual rollouts reduce risk
 - ✅ User targeting for beta testing
@@ -541,6 +558,7 @@ Use services like LaunchDarkly, PostHog, or Unleash when you need:
 ### Feature Flag Hygiene
 
 **Best practices:**
+
 - Clean up old flags (remove after full rollout)
 - Document flag dependencies (flag A requires flag B)
 - Test both enabled and disabled states
@@ -548,12 +566,11 @@ Use services like LaunchDarkly, PostHog, or Unleash when you need:
 - Monitor flag usage (which flags are actively used)
 
 **Anti-patterns:**
+
 - ❌ Too many nested flags (complex logic)
 - ❌ Flags that never get removed (technical debt)
 - ❌ Flags without documentation
 - ❌ Flags that depend on each other (complex dependencies)
-
-> See examples.md Feature Flags section for implementation
 
 ---
 
@@ -566,12 +583,14 @@ Use services like LaunchDarkly, PostHog, or Unleash when you need:
 **Pattern: Single configuration object with environment overrides**
 
 **Why:**
+
 - Centralized configuration
 - Type-safe access
 - Easy to test
 - Clear environment differences
 
 **Structure:**
+
 1. Base configuration (shared across environments)
 2. Environment-specific overrides (development, staging, production)
 3. Merge into single config object
@@ -581,17 +600,20 @@ Use services like LaunchDarkly, PostHog, or Unleash when you need:
 **Common configuration categories:**
 
 1. **API Configuration**
+
    - Base URL
    - Timeout
    - Retry attempts
    - Rate limits
 
 2. **Cache Configuration**
+
    - TTL (time to live)
    - Max size
    - Eviction policy
 
 3. **Feature Configuration**
+
    - Feature flags
    - Analytics
    - Error tracking
@@ -606,18 +628,17 @@ Use services like LaunchDarkly, PostHog, or Unleash when you need:
 **Pattern: Detect environment from env variable**
 
 ```typescript
-const ENV = process.env.NODE_ENV || 'development';
-const IS_PRODUCTION = ENV === 'production';
-const IS_DEVELOPMENT = ENV === 'development';
-const IS_TEST = ENV === 'test';
+const ENV = process.env.NODE_ENV || "development";
+const IS_PRODUCTION = ENV === "production";
+const IS_DEVELOPMENT = ENV === "development";
+const IS_TEST = ENV === "test";
 ```
 
 **Next.js environments:**
+
 - `development` - Local development (`next dev`)
 - `production` - Production build (`next build` + `next start`)
 - `test` - Testing environment (Vitest, Jest)
-
-> See examples.md Configuration by Environment section for implementation
 
 ---
 
@@ -641,16 +662,19 @@ const IS_TEST = ENV === 'test';
 ## Resources
 
 **Official documentation:**
+
 - Next.js Environment Variables: https://nextjs.org/docs/app/building-your-application/configuring/environment-variables
 - Vite Environment Variables: https://vitejs.dev/guide/env-and-mode.html
 - Turborepo Environment Variables: https://turbo.build/repo/docs/handbook/environment-variables
 
 **Tools:**
+
 - Zod validation: https://zod.dev/
 - dotenv: https://github.com/motdotla/dotenv
 - TruffleHog (secret scanning): https://github.com/trufflesecurity/trufflehog
 
 **Feature flags:**
+
 - LaunchDarkly: https://launchdarkly.com/
 - PostHog: https://posthog.com/
 - Unleash: https://www.getunleash.io/

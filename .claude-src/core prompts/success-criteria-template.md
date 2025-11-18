@@ -121,7 +121,7 @@ Focus on test coverage and quality:
 - Tests fail before implementation (red)
 - Tests pass after implementation (green)
 
-**Reviewer Agent**
+**Reviewer General and Reviewer React Agent**
 Focus on quality gates:
 
 - Code follows conventions
@@ -129,7 +129,7 @@ Focus on quality gates:
 - Performance is acceptable
 - Patterns are consistent
 
-**PM Agent (Auggie)**
+**PM Agent**
 Focus on completeness and clarity:
 
 - Requirements are clear and actionable
@@ -143,7 +143,7 @@ Focus on completeness and clarity:
 
 Success criteria should be:
 
-1. **Defined by PM/Auggie** in the initial specification
+1. **Defined by PM** in the initial specification
 2. **Understood by Developer** before starting implementation
 3. **Verified by Developer** after implementation
 4. **Confirmed by Reviewer** during code review

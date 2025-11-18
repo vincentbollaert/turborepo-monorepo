@@ -52,8 +52,6 @@ React Testing Library + MSW useful for component behavior when E2E too slow. Don
 - Test files: `*.spec.ts` or `*.e2e.ts`
 - Group by user journey, not by component
 
-> See examples.md E2E Testing section for Playwright examples
-
 **RED FLAGS:**
 
 - ❌ No E2E tests for critical user flows
@@ -107,8 +105,6 @@ describe("calculateTotal", () => {
   });
 });
 ```
-
-> See examples.md Unit Testing section for more examples
 
 **RED FLAGS:**
 
@@ -196,8 +192,6 @@ test('displays incremented count', () => {
 - MSW for API mocking at network level
 - Centralized mock data in `@repo/api-mocks`
 - Test all states: loading, empty, error, success
-
-> See examples.md Integration Testing section for current codebase examples
 
 **Migration Path:**
 
@@ -342,8 +336,6 @@ packages/api-mocks/src/
 - Mocks can drift from real API
 - Need to maintain mock data
 - Doesn't catch real API issues
-
-> See examples.md Mock Data Patterns section for current patterns
 
 **Future: Replace with E2E tests against real APIs in test environment**
 

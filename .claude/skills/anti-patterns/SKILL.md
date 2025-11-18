@@ -29,6 +29,7 @@ This document compiles all anti-patterns identified across the frontend standard
 ## State Management Anti-Patterns
 
 **❌ NEVER:**
+
 - Store server data in Zustand (use React Query instead)
 - Store client UI state in React Query (use Zustand instead)
 - Create unnecessary object references in Zustand selectors (causes re-renders)
@@ -41,6 +42,7 @@ This document compiles all anti-patterns identified across the frontend standard
 ## TypeScript Anti-Patterns
 
 **❌ NEVER:**
+
 - Use `any` without explicit justification comment
 - Use `@ts-ignore` or `@ts-expect-error` without explaining why
 - Skip type definitions for exported functions
@@ -49,12 +51,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Use `I` prefix for interfaces (e.g., `IProduct`)
 - Use `interface` for component props (use `type` instead)
 
-
 ---
 
 ## Component Anti-Patterns
 
 **❌ NEVER:**
+
 - Create God components (> 300 lines, > 10 props)
 - Skip ref forwarding on interactive elements
 - Skip className exposure (prevents customization)
@@ -64,12 +66,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Use default exports in library components (use named exports)
 - Mix casing (Button.tsx vs button.module.scss)
 
-
 ---
 
 ## Performance Anti-Patterns
 
 **❌ NEVER:**
+
 - Memoize everything (premature optimization has overhead)
 - Skip memoization for expensive operations
 - Use inline function definitions in JSX props (causes re-renders)
@@ -81,12 +83,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Not measure performance before optimizing
 - Set bundle size budgets (sizes grow unnoticed)
 
-
 ---
 
 ## Testing Anti-Patterns
 
 **❌ NEVER:**
+
 - Test implementation details (test behavior, not implementation)
 - Use brittle selectors (prefer `getByRole`, `getByLabelText`)
 - Skip MSW setup for API tests
@@ -96,12 +98,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Mock too much (integration tests should use real dependencies)
 - Skip accessibility testing
 
-
 ---
 
 ## API & Data Fetching Anti-Patterns
 
 **❌ NEVER:**
+
 - Hardcode API URLs (use environment variables)
 - Skip error handling for API calls
 - Skip loading states
@@ -111,12 +113,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Not handle race conditions
 - Skip request deduplication
 
-
 ---
 
 ## Styling Anti-Patterns
 
 **❌ NEVER:**
+
 - Use CSS-in-JS (styled-components, Emotion) - use SCSS Modules
 - Use inline styles for anything other than dynamic values
 - Hardcode colors/spacing (use design tokens)
@@ -125,12 +127,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Skip Ladle stories for design system components
 - Use Tailwind classes directly in components (use design tokens)
 
-
 ---
 
 ## Accessibility Anti-Patterns
 
 **❌ NEVER:**
+
 - Remove focus outlines without replacement
 - Use `div` or `span` for buttons/links
 - Add click handlers on non-interactive elements without role/keyboard support
@@ -142,12 +144,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Create form inputs without labels
 - Skip keyboard navigation support
 
-
 ---
 
 ## Build & Tooling Anti-Patterns
 
 **❌ NEVER:**
+
 - Skip linting configuration
 - Use multiple icon libraries (use lucide-react)
 - Import entire lucide-react package
@@ -157,12 +159,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Skip pre-commit hooks
 - Not use Turborepo caching (wastes build time)
 
-
 ---
 
 ## Environment & Security Anti-Patterns
 
 **❌ NEVER:**
+
 - Commit secrets to repository
 - Use `process.env.VARIABLE` directly without validation
 - Hardcode environment values in code
@@ -175,12 +177,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Expose secrets in client-side code (must use framework prefixes)
 - Use `dangerouslySetInnerHTML` with user input
 
-
 ---
 
 ## File & Directory Anti-Patterns
 
 **❌ NEVER:**
+
 - Use PascalCase for file names (use kebab-case)
 - Mix casing (Button.tsx and button.module.scss)
 - Use default exports in libraries
@@ -188,12 +190,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Import from internal paths instead of package exports
 - Use relative imports for cross-package imports
 
-
 ---
 
 ## Monorepo Anti-Patterns
 
 **❌ NEVER:**
+
 - Have version mismatches across packages (use syncpack)
 - Skip dependency synchronization
 - Not declare environment variables in turbo.json
@@ -202,7 +204,6 @@ This document compiles all anti-patterns identified across the frontend standard
 - Not use remote caching (wastes CI time)
 - Not use affected builds
 
-
 ---
 
 ## Quick Anti-Pattern Checklist
@@ -210,6 +211,7 @@ This document compiles all anti-patterns identified across the frontend standard
 Review this checklist before submitting code:
 
 **Code Quality:**
+
 - [ ] No `any` without justification
 - [ ] No magic numbers
 - [ ] No hardcoded values
@@ -217,6 +219,7 @@ Review this checklist before submitting code:
 - [ ] kebab-case file names
 
 **Components:**
+
 - [ ] Ref forwarding on interactive elements
 - [ ] className prop exposed
 - [ ] No God components (< 300 lines)
@@ -224,30 +227,35 @@ Review this checklist before submitting code:
 - [ ] Design tokens (no hardcoded colors/spacing)
 
 **State & Data:**
+
 - [ ] Server data in React Query
 - [ ] UI state in Zustand
 - [ ] Separate selectors (or `shallow` when destructuring)
 - [ ] No prop drilling for global state
 
 **Performance:**
+
 - [ ] Lazy load routes
 - [ ] No unnecessary memoization
 - [ ] Optimized images
 - [ ] No large libraries imported whole
 
 **Testing:**
+
 - [ ] MSW for API mocking
 - [ ] Testing Library queries (getByRole)
 - [ ] Integration tests
 - [ ] Accessibility tests
 
 **Security:**
+
 - [ ] No committed secrets
 - [ ] Validated environment variables
 - [ ] No exposed API keys
 - [ ] Input sanitization
 
 **Accessibility:**
+
 - [ ] Semantic HTML
 - [ ] Keyboard navigation
 - [ ] ARIA labels

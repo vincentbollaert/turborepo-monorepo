@@ -331,8 +331,6 @@ All code must follow established patterns and conventions:
   - Variants defined with `cva` **only when multiple variants exist**
   - Components are composable (not monolithic)
 
-> See examples.md Component Architecture section for code examples
-
 **When to use cva:**
 
 - ✅ Component has multiple variant options (size, variant, color, etc.)
@@ -509,8 +507,6 @@ export type ButtonProps = React.ComponentProps<"button"> &
   - Design tokens for UI values
 - Configuration objects over scattered constants
 
-> See examples.md Constants and Magic Numbers section for code examples
-
 **Common areas with magic numbers:**
 
 - Timeouts and intervals
@@ -534,8 +530,6 @@ export type ButtonProps = React.ComponentProps<"button"> &
 ## TypeScript Strictness
 
 **MANDATORY: Strict mode enabled in tsconfig.json**
-
-> See examples.md TypeScript Strictness section for required tsconfig.json settings
 
 **Enforcement:**
 
@@ -565,8 +559,6 @@ export type ButtonProps = React.ComponentProps<"button"> &
 - Error recovery strategies
 - Network error handling
 - Async error handling patterns
-
-> See examples.md Error Handling Patterns section for code examples
 
 ---
 
@@ -643,8 +635,6 @@ export type ButtonProps = React.ComponentProps<"button"> &
 }
 ```
 
-> See examples.md Component State Styling section for code examples
-
 **RED FLAGS:**
 
 - ❌ Using className toggling for state (e.g., `className={isExpanded ? 'expanded' : ''}`)
@@ -691,8 +681,6 @@ components/button/
 └── button.stories.tsx    # Required for design system!
 ```
 
-> See examples.md Component Documentation section for code examples
-
 **RED FLAGS:**
 
 - ❌ Design system components without story files
@@ -738,8 +726,6 @@ import { IconName } from "lucide-react";
 - ❌ Brand logos or custom graphics
 - ❌ Complex illustrations
 - ❌ Icons not available in lucide-react
-
-> See examples.md Icon Library section for code examples
 
 **RED FLAGS:**
 
@@ -1776,23 +1762,25 @@ import {
 Open Props provides battle-tested design tokens. Semantic tokens reference Open Props. Components never use Open Props directly.
 
 **Example:**
+
 ```scss
 // packages/ui/src/styles/variables.scss
 // ✅ CORRECT: Semantic tokens reference Open Props
---color-primary: var(--blue-2);      // From Open Props
---color-accent: var(--cyan-4);       // From Open Props
---shadow-md: var(--shadow-2);        // From Open Props
+--color-primary: var(--blue-2); // From Open Props
+--color-accent: var(--cyan-4); // From Open Props
+--shadow-md: var(--shadow-2); // From Open Props
 
 // ✅ Component usage (always use semantic tokens)
 .button {
-  color: var(--color-primary);       // NOT var(--blue-2)
-  box-shadow: var(--shadow-md);      // NOT var(--shadow-2)
+  color: var(--color-primary); // NOT var(--blue-2)
+  box-shadow: var(--shadow-md); // NOT var(--shadow-2)
 }
 ```
 
 **Commonly used:** Colors (`--gray-*`, `--blue-*`, `--cyan-4`), Shadows (`--shadow-1/2/3`), Spacing.
 
 **RED FLAGS:**
+
 - ❌ Using Open Props variables directly in components (bypasses semantic layer)
 - ❌ Mixing custom color scales with Open Props (creates inconsistency)
 - ❌ Not using semantic tokens (makes theme changes difficult)
@@ -1955,8 +1943,6 @@ import styles from "./button.module.scss";
 - Expose `className` prop for customization
 - Use `asChild` pattern for polymorphic components (design system components)
 
-> See code-conventions/docs.md Component Architecture section for detailed component patterns
-
 ---
 
 ## Component-Specific Variables
@@ -2032,7 +2018,7 @@ import styles from "./button.module.scss";
 
 ```scss
 .icon {
-  width: var(--text-size-icon);   // 16px
+  width: var(--text-size-icon); // 16px
   height: var(--text-size-icon);
 }
 ```
@@ -2043,7 +2029,7 @@ Icons automatically inherit color from their parent element's text color. Use se
 
 ```scss
 .button {
-  color: var(--color-text-default);  // Icon inherits this color
+  color: var(--color-text-default); // Icon inherits this color
 }
 ```
 
@@ -2056,8 +2042,6 @@ Icon-only buttons must have accessible labels:
   <ChevronDown />
 </Button>
 ```
-
-> See code-conventions/docs.md Icon Library section for implementation details and usage patterns
 
 
 ---
@@ -3516,6 +3500,1570 @@ Creating a new UI element?
 - **Avoid premature abstraction:** Don't create a Pattern until you've used the composition at least 2-3 times
 - **Templates are optional:** Small apps may not need Templates - just use Patterns directly in pages
 - **Domain language:** Pattern names should use your domain language ("Feature", "Navigation") while Component names should be generic ("Button", "Card")
+
+
+
+---
+
+# Quick Reference
+
+**Auto-detection:** Quick patterns, code templates, do's and don'ts, common snippets, fast feedback commands, decision trees, essential patterns
+
+**When to use:**
+
+- Need a quick reference for component patterns and templates
+- Looking for critical do's and don'ts across all domains
+- Want file-scoped commands for fast feedback loops
+- Need decision trees for common architectural questions
+- Seeking common code snippets (hooks, validation, mocking)
+- Quick lookups during active development
+
+**Key patterns covered:**
+
+- Essential code templates (components, hooks, stores, forms)
+- Critical do's and don'ts for all major areas (state, TypeScript, testing, security)
+- File-scoped commands for fast feedback (single file, package, affected)
+- Common code snippets (environment validation, MSW setup, custom hooks)
+- Decision trees for state management, styling, memoization, and testing
+- Quick checklists for commits and PRs
+
+---
+
+# Quick Reference for AI
+
+> **Quick Guide:** Essential patterns, critical do's and don'ts, and file-scoped commands for fast feedback. This is a condensed reference of all previous sections.
+
+---
+
+## Essential Code Patterns
+
+### Component Template (Recommended Structure)
+
+```typescript
+import { forwardRef } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import styles from './button.module.scss';
+
+// Variants using cva (only when multiple variants exist)
+const buttonVariants = cva(styles.button, {
+  variants: {
+    variant: {
+      primary: styles.primary,
+      secondary: styles.secondary,
+    },
+    size: {
+      sm: styles.sm,
+      md: styles.md,
+      lg: styles.lg,
+    },
+  },
+  defaultVariants: {
+    variant: 'primary',
+    size: 'md',
+  },
+});
+
+// Props type
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+  VariantProps<typeof buttonVariants> & {
+    // Custom props
+  };
+
+// Component with ref forwarding
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ variant, size, className, children, ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={buttonVariants({ variant, size, className })}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  }
+);
+
+Button.displayName = 'Button';
+```
+
+### API Client Hook Template
+
+```typescript
+// React Query pattern for data fetching
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
+
+// Query hook
+export function useProducts() {
+  return useQuery({
+    queryKey: ['products'],
+    queryFn: () => apiClient.getProducts(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+// Mutation hook
+export function useCreateProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateProductData) => apiClient.createProduct(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+}
+```
+
+### Zustand Store Template
+
+```typescript
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+import { shallow } from 'zustand/shallow';
+
+interface UIStore {
+  // State
+  isSidebarOpen: boolean;
+  theme: 'light' | 'dark';
+
+  // Actions
+  toggleSidebar: () => void;
+  setTheme: (theme: 'light' | 'dark') => void;
+}
+
+export const useUIStore = create<UIStore>()(
+  devtools(
+    persist(
+      (set) => ({
+        // Initial state
+        isSidebarOpen: false,
+        theme: 'light',
+
+        // Actions
+        toggleSidebar: () =>
+          set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
+        setTheme: (theme) => set({ theme }),
+      }),
+      { name: 'ui-store' }
+    )
+  )
+);
+
+// Usage with shallow for multiple selects
+const { isSidebarOpen, toggleSidebar } = useUIStore(
+  (state) => ({ isSidebarOpen: state.isSidebarOpen, toggleSidebar: state.toggleSidebar }),
+  shallow
+);
+```
+
+### Form Handling with React Hook Form + Zod
+
+```typescript
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+// Schema
+const formSchema = z.object({
+  email: z.string().email('Invalid email'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
+// Component
+function LoginForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+  });
+
+  const onSubmit = async (data: FormData) => {
+    await login(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input {...register('email')} />
+      {errors.email && <span>{errors.email.message}</span>}
+
+      <input type="password" {...register('password')} />
+      {errors.password && <span>{errors.password.message}</span>}
+
+      <button type="submit" disabled={isSubmitting}>
+        Login
+      </button>
+    </form>
+  );
+}
+```
+
+---
+
+## Critical Do's ✅
+
+**State Management:**
+- ✅ Use React Query (TanStack Query) for server state
+- ✅ Use Zustand for client UI state
+- ✅ Use `shallow` when selecting multiple Zustand values
+- ✅ Invalidate queries after mutations
+
+**TypeScript:**
+- ✅ Enable strict mode
+- ✅ Use `type` for component props
+- ✅ Use `interface` for API contracts
+- ✅ Annotate function return types
+- ✅ Use `unknown` instead of `any` when type is truly unknown
+
+**Components:**
+- ✅ Forward refs on interactive elements
+- ✅ Expose `className` prop for customization
+- ✅ Use data-attributes for state-based styling
+- ✅ Keep components under 300 lines
+- ✅ Use named exports (not default)
+
+**API & Data:**
+- ✅ Use hey-api (@hey-api/openapi-ts) for API client generation
+- ✅ Validate environment variables with Zod
+- ✅ Use MSW for API mocking in tests
+- ✅ Handle loading, error, and empty states
+
+**Testing:**
+- ✅ Use React Testing Library queries (getByRole, getByLabelText)
+- ✅ Test user behavior, not implementation
+- ✅ Aim for > 80% code coverage
+- ✅ Test accessibility (keyboard navigation, ARIA)
+
+**Performance:**
+- ✅ Lazy load routes
+- ✅ Code split heavy components
+- ✅ Optimize images (WebP/AVIF, lazy loading)
+- ✅ Use Next.js Image component when available
+- ✅ Monitor bundle size (< 200KB main bundle)
+
+**Styling:**
+- ✅ Use SCSS Modules (not CSS-in-JS)
+- ✅ Use three-tier design token system (primitives → semantic → component)
+- ✅ Use `cva` for components with multiple variants
+- ✅ Use Ladle for component stories
+
+**Security:**
+- ✅ Store secrets in environment variables
+- ✅ Rotate secrets quarterly
+- ✅ Run security audits (Dependabot, Snyk)
+- ✅ Use CSP headers
+- ✅ Sanitize user input with DOMPurify if rendering HTML
+
+**Build & Tooling:**
+- ✅ Use Turborepo for monorepo builds
+- ✅ Enable remote caching (Vercel)
+- ✅ Use affected detection in CI
+- ✅ Use lucide-react for icons (import specific icons)
+- ✅ Use named constants (no magic numbers)
+
+---
+
+## Critical Don'ts ❌
+
+**State Management:**
+- ❌ Never store server data in Zustand (use React Query)
+- ❌ Never store UI state in React Query (use Zustand)
+- ❌ Never skip `shallow` for multiple Zustand selects (causes re-renders)
+- ❌ Never mutate state directly (use immutable updates)
+
+**TypeScript:**
+- ❌ Never use `any` without justification comment
+- ❌ Never use `@ts-ignore` without explanation
+- ❌ Never skip function return type annotations
+- ❌ Never use `I` prefix for interfaces (e.g., `IUser`)
+- ❌ Never use `interface` for component props (use `type`)
+
+**Components:**
+- ❌ Never create God components (> 300 lines, > 10 props)
+- ❌ Never skip ref forwarding on interactive elements
+- ❌ Never skip className exposure
+- ❌ Never use inline styles (use design tokens)
+- ❌ Never use default exports in libraries
+- ❌ Never use cva for components with no variants
+
+**API & Data:**
+- ❌ Never hardcode API URLs (use environment variables)
+- ❌ Never skip error handling for API calls
+- ❌ Never skip loading states
+- ❌ Never mutate cache directly (use React Query helpers)
+- ❌ Never fetch on every render (use caching)
+
+**Testing:**
+- ❌ Never test implementation details
+- ❌ Never use brittle selectors (querySelector)
+- ❌ Never skip MSW setup for API tests
+- ❌ Never skip integration tests
+- ❌ Never skip accessibility testing
+- ❌ Never mock too much (test real behavior)
+
+**Performance:**
+- ❌ Never memoize everything (premature optimization)
+- ❌ Never import entire libraries (`import _ from 'lodash'`)
+- ❌ Never import entire lucide-react package
+- ❌ Never skip lazy loading for routes
+- ❌ Never skip image optimization
+- ❌ Never optimize without measuring first
+
+**Styling:**
+- ❌ Never use CSS-in-JS (styled-components, Emotion)
+- ❌ Never use inline styles except for dynamic values
+- ❌ Never hardcode colors/spacing (use design tokens)
+- ❌ Never use className toggling for state (use data-attributes)
+- ❌ Never use Tailwind classes directly (use design tokens)
+
+**Accessibility:**
+- ❌ Never remove focus outlines without replacement
+- ❌ Never use `div` or `span` for buttons/links
+- ❌ Never use color-only error indicators
+- ❌ Never use placeholder as label replacement
+- ❌ Never disable form submit buttons (show errors instead)
+- ❌ Never skip keyboard navigation support
+
+**Security:**
+- ❌ Never commit secrets to repository
+- ❌ Never use `dangerouslySetInnerHTML` with user input
+- ❌ Never hardcode API keys in code
+- ❌ Never use production secrets in development
+- ❌ Never skip environment variable validation
+- ❌ Never expose secrets in client-side code
+
+**Build & Tooling:**
+- ❌ Never use PascalCase for file names (use kebab-case)
+- ❌ Never mix casing (Button.tsx and button.module.scss)
+- ❌ Never modify generated files manually
+- ❌ Never skip TypeScript strict mode
+- ❌ Never skip pre-commit hooks
+- ❌ Never use multiple icon libraries
+
+---
+
+## File-Scoped Commands
+
+**Fast Feedback (Single File Operations):**
+
+```bash
+# Type check single file
+bun tsc --noEmit path/to/file.ts
+
+# Format single file
+bun prettier --write path/to/file.ts
+
+# Lint single file
+bun eslint path/to/file.ts --fix
+
+# Run single test file
+bun vitest run path/to/file.test.ts
+
+# Run test file in watch mode
+bun vitest watch path/to/file.test.ts
+```
+
+**Package-Scoped Operations:**
+
+```bash
+# Run tests in specific package
+bun --filter @repo/ui test
+
+# Build specific package
+bun --filter @repo/ui build
+
+# Type check specific package
+bun --filter @repo/ui type-check
+
+# Lint specific package
+bun --filter @repo/ui lint
+```
+
+**Affected Detection (Turborepo):**
+
+```bash
+# Test only affected packages
+bun turbo test --filter=...[origin/main]
+
+# Build only affected packages
+bun turbo build --filter=...[origin/main]
+
+# Lint only affected packages
+bun turbo lint --filter=...[origin/main]
+
+# Type check only affected packages
+bun turbo type-check --filter=...[origin/main]
+```
+
+**Git Operations:**
+
+```bash
+# Stage specific file
+git add path/to/file.ts
+
+# Commit with message
+git commit -m "feat: add new feature"
+
+# Create new branch
+git checkout -b feature/new-feature
+
+# Push to remote
+git push -u origin feature/new-feature
+
+# Amend last commit (ONLY if not pushed)
+git commit --amend --no-edit
+```
+
+**Dependency Management:**
+
+```bash
+# Install package in specific workspace
+bun add package-name --filter @repo/ui
+
+# Install dev dependency
+bun add -d package-name --filter @repo/ui
+
+# Remove package
+bun remove package-name --filter @repo/ui
+
+# Update all dependencies (check for updates)
+bun update
+
+# Audit dependencies
+bun audit
+
+# Check for outdated packages
+bun outdated
+```
+
+---
+
+## Common Code Snippets
+
+### Environment Variable Validation
+
+```typescript
+import { z } from 'zod';
+
+const envSchema = z.object({
+  NEXT_PUBLIC_API_URL: z.string().url(),
+  NEXT_PUBLIC_ENVIRONMENT: z.enum(['development', 'staging', 'production']),
+  NODE_ENV: z.enum(['development', 'production']).default('development'),
+});
+
+export function getEnv() {
+  try {
+    return envSchema.parse({
+      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+      NEXT_PUBLIC_ENVIRONMENT: process.env.NEXT_PUBLIC_ENVIRONMENT,
+      NODE_ENV: process.env.NODE_ENV,
+    });
+  } catch (error) {
+    console.error('❌ Invalid environment variables:', error);
+    throw new Error('Invalid environment configuration');
+  }
+}
+```
+
+### MSW Handler Setup
+
+```typescript
+// src/mocks/handlers.ts
+import { http, HttpResponse } from 'msw';
+
+export const handlers = [
+  http.get('/api/users', () => {
+    return HttpResponse.json([
+      { id: '1', name: 'John Doe' },
+      { id: '2', name: 'Jane Smith' },
+    ]);
+  }),
+
+  http.post('/api/users', async ({ request }) => {
+    const body = await request.json();
+    return HttpResponse.json({ id: '3', ...body }, { status: 201 });
+  }),
+
+  http.get('/api/users/:id', ({ params }) => {
+    return HttpResponse.json({ id: params.id, name: 'John Doe' });
+  }),
+
+  // Error simulation
+  http.get('/api/error', () => {
+    return new HttpResponse(null, { status: 500 });
+  }),
+];
+
+// src/mocks/server.ts (for Node/tests)
+import { setupServer } from 'msw/node';
+import { handlers } from './handlers';
+
+export const server = setupServer(...handlers);
+
+// src/test/setup.ts
+import { beforeAll, afterEach, afterAll } from 'vitest';
+import { server } from '../mocks/server';
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+```
+
+### Debounce Hook
+
+```typescript
+import { useEffect, useState } from 'react';
+
+export function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Usage
+function SearchComponent() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const { data } = useQuery({
+    queryKey: ['search', debouncedSearchTerm],
+    queryFn: () => searchAPI(debouncedSearchTerm),
+    enabled: debouncedSearchTerm.length > 0,
+  });
+
+  return <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />;
+}
+```
+
+### Local Storage Hook
+
+```typescript
+import { useState, useEffect } from 'react';
+
+export function useLocalStorage<T>(key: string, initialValue: T) {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === 'undefined') return initialValue;
+
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error(error);
+      return initialValue;
+    }
+  });
+
+  const setValue = (value: T | ((val: T) => T)) => {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return [storedValue, setValue] as const;
+}
+```
+
+---
+
+## Decision Tree
+
+**"Where should I put this state?"**
+
+```
+Is it server data (from API)?
+├─ YES → React Query
+└─ NO → Is it needed across multiple components?
+    ├─ YES → Zustand
+    └─ NO → Is it form data?
+        ├─ YES → React Hook Form
+        └─ NO → useState in component
+```
+
+**"How should I style this component?"**
+
+```
+Does component have variants (primary/secondary, sm/md/lg)?
+├─ YES → SCSS Modules + cva
+└─ NO → SCSS Modules only
+
+Are values dynamic (runtime values)?
+├─ YES → CSS custom properties or inline styles
+└─ NO → Design tokens in SCSS
+```
+
+**"Should I memoize this?"**
+
+```
+Is it slow (> 5ms)?
+├─ YES → Use useMemo/useCallback
+└─ NO → Does it cause child re-renders?
+    ├─ YES → Use React.memo on child + useCallback for props
+    └─ NO → Don't memoize (premature optimization)
+```
+
+**"How should I test this?"**
+
+```
+Is it a component?
+├─ YES → React Testing Library + MSW
+└─ NO → Is it a hook?
+    ├─ YES → @testing-library/react-hooks
+    └─ NO → Is it a utility function?
+        ├─ YES → Vitest unit test
+        └─ NO → Integration test
+```
+
+---
+
+## Quick Checklist
+
+**Before Committing Code:**
+
+- [ ] No `any` without justification
+- [ ] No magic numbers (use named constants)
+- [ ] No hardcoded values (use config/env vars)
+- [ ] Named exports only (no default exports in libraries)
+- [ ] kebab-case file names
+- [ ] Ref forwarding on interactive components
+- [ ] className prop exposed
+- [ ] No God components (< 300 lines)
+- [ ] Data-attributes for state styling (not className toggling)
+- [ ] Design tokens (no hardcoded colors/spacing)
+- [ ] Tests written and passing
+- [ ] Type check passes (`bun tsc --noEmit`)
+- [ ] Lint passes (`bun eslint .`)
+- [ ] Format applied (`bun prettier --write .`)
+
+**Before Submitting PR:**
+
+- [ ] All tests pass
+- [ ] No TypeScript errors
+- [ ] No ESLint errors
+- [ ] Code formatted
+- [ ] Branch up to date with main
+- [ ] Meaningful commit messages
+- [ ] PR description explains changes
+- [ ] Screenshots/videos for UI changes
+- [ ] No console.logs left in code
+- [ ] No commented-out code
+- [ ] Bundle size checked (if applicable)
+- [ ] Accessibility tested (keyboard nav)
+
+---
+
+## Documentation Map
+
+**Core Patterns** (.claude-src/core patterns/):
+- package-architecture - Monorepo structure, package naming, dependency boundaries, UI library organization
+- code-conventions - Component patterns, TypeScript strictness, file naming, constants, error handling, icons
+- design-system - Design tokens, color system, spacing, typography, SCSS modules, iconography
+
+**Skills** (.claude-src/skills/):
+- api-client - API client architecture and patterns
+- state-management - State management with React Query and Zustand
+- testing - Testing standards with Vitest and React Testing Library
+- accessibility - WCAG compliance and accessibility patterns
+- build-tooling - Build configuration and tooling (Turborepo, Vite, etc.)
+- ci-cd - CI/CD pipeline patterns
+- env-management - Environment variable management
+- performance - Performance optimization patterns
+- security - Security patterns and best practices
+- anti-patterns - Common anti-patterns to avoid
+
+
+---
+
+# Quick Reference for AI - Examples
+
+---
+
+## Essential Patterns
+
+### Example: Complete Component Template
+
+```typescript
+// button.tsx
+import { forwardRef } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import styles from './button.module.scss';
+
+const buttonVariants = cva(styles.button, {
+  variants: {
+    variant: {
+      primary: styles.primary,
+      secondary: styles.secondary,
+      danger: styles.danger,
+    },
+    size: {
+      sm: styles.sm,
+      md: styles.md,
+      lg: styles.lg,
+    },
+  },
+  defaultVariants: {
+    variant: 'primary',
+    size: 'md',
+  },
+});
+
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+  VariantProps<typeof buttonVariants> & {
+    loading?: boolean;
+  };
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ variant, size, className, children, loading, disabled, ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={buttonVariants({ variant, size, className })}
+        disabled={disabled || loading}
+        data-loading={loading ? 'true' : undefined}
+        {...props}
+      >
+        {loading ? 'Loading...' : children}
+      </button>
+    );
+  }
+);
+
+Button.displayName = 'Button';
+```
+
+```scss
+// button.module.scss
+@use '@repo/design-tokens' as *;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-family-base;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-md;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-focus;
+    outline-offset: 2px;
+  }
+
+  &[data-loading='true'] {
+    opacity: 0.7;
+  }
+}
+
+.primary {
+  background: $color-primary;
+  color: $color-on-primary;
+
+  &:hover:not(:disabled) {
+    background: $color-primary-hover;
+  }
+}
+
+.secondary {
+  background: $color-secondary;
+  color: $color-on-secondary;
+
+  &:hover:not(:disabled) {
+    background: $color-secondary-hover;
+  }
+}
+
+.sm {
+  height: $size-button-sm;
+  padding: 0 $spacing-sm;
+  font-size: $font-size-sm;
+}
+
+.md {
+  height: $size-button-md;
+  padding: 0 $spacing-md;
+  font-size: $font-size-base;
+}
+
+.lg {
+  height: $size-button-lg;
+  padding: 0 $spacing-lg;
+  font-size: $font-size-lg;
+}
+```
+
+---
+
+### Example: React Query + API Client Pattern
+
+```typescript
+// hooks/use-products.ts
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
+import type { Product, CreateProductData } from '@/types';
+
+// Query keys
+const productKeys = {
+  all: ['products'] as const,
+  lists: () => [...productKeys.all, 'list'] as const,
+  list: (filters: string) => [...productKeys.lists(), { filters }] as const,
+  details: () => [...productKeys.all, 'detail'] as const,
+  detail: (id: string) => [...productKeys.details(), id] as const,
+};
+
+// List query
+export function useProducts(filters?: string) {
+  return useQuery({
+    queryKey: productKeys.list(filters || 'all'),
+    queryFn: () => apiClient.getProducts({ filters }),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+// Detail query
+export function useProduct(id: string) {
+  return useQuery({
+    queryKey: productKeys.detail(id),
+    queryFn: () => apiClient.getProduct({ id }),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+// Create mutation
+export function useCreateProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateProductData) => apiClient.createProduct({ body: data }),
+    onSuccess: () => {
+      // Invalidate all product lists
+      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+    },
+  });
+}
+
+// Update mutation with optimistic update
+export function useUpdateProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Product> }) =>
+      apiClient.updateProduct({ id, body: data }),
+    onMutate: async ({ id, data }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: productKeys.detail(id) });
+
+      // Snapshot previous value
+      const previousProduct = queryClient.getQueryData(productKeys.detail(id));
+
+      // Optimistically update
+      queryClient.setQueryData(productKeys.detail(id), (old: Product | undefined) =>
+        old ? { ...old, ...data } : old
+      );
+
+      return { previousProduct };
+    },
+    onError: (err, { id }, context) => {
+      // Rollback on error
+      queryClient.setQueryData(productKeys.detail(id), context?.previousProduct);
+    },
+    onSettled: (data, error, { id }) => {
+      // Refetch after error or success
+      queryClient.invalidateQueries({ queryKey: productKeys.detail(id) });
+    },
+  });
+}
+
+// Delete mutation
+export function useDeleteProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => apiClient.deleteProduct({ id }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+    },
+  });
+}
+```
+
+**Usage in component:**
+
+```typescript
+function ProductList() {
+  const { data: products, isLoading, error } = useProducts();
+  const { mutate: deleteProduct } = useDeleteProduct();
+
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage error={error} />;
+  if (!products?.length) return <EmptyState />;
+
+  return (
+    <ul>
+      {products.map((product) => (
+        <li key={product.id}>
+          {product.name}
+          <button onClick={() => deleteProduct(product.id)}>Delete</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+---
+
+### Example: Zustand Store with Slices
+
+```typescript
+// stores/use-app-store.ts
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+
+// UI Slice
+interface UISlice {
+  isSidebarOpen: boolean;
+  theme: 'light' | 'dark';
+  toggleSidebar: () => void;
+  setTheme: (theme: 'light' | 'dark') => void;
+}
+
+const createUISlice = (set: any): UISlice => ({
+  isSidebarOpen: false,
+  theme: 'light',
+  toggleSidebar: () => set((state: any) => ({ isSidebarOpen: !state.isSidebarOpen })),
+  setTheme: (theme) => set({ theme }),
+});
+
+// User Slice
+interface UserSlice {
+  user: { id: string; name: string } | null;
+  setUser: (user: UserSlice['user']) => void;
+  logout: () => void;
+}
+
+const createUserSlice = (set: any): UserSlice => ({
+  user: null,
+  setUser: (user) => set({ user }),
+  logout: () => set({ user: null }),
+});
+
+// Notification Slice
+interface NotificationSlice {
+  notifications: Array<{ id: string; message: string; type: 'info' | 'error' | 'success' }>;
+  addNotification: (notification: Omit<NotificationSlice['notifications'][0], 'id'>) => void;
+  removeNotification: (id: string) => void;
+}
+
+const createNotificationSlice = (set: any): NotificationSlice => ({
+  notifications: [],
+  addNotification: (notification) =>
+    set((state: any) => ({
+      notifications: [...state.notifications, { ...notification, id: Date.now().toString() }],
+    })),
+  removeNotification: (id) =>
+    set((state: any) => ({
+      notifications: state.notifications.filter((n: any) => n.id !== id),
+    })),
+});
+
+// Combined Store
+type AppStore = UISlice & UserSlice & NotificationSlice;
+
+export const useAppStore = create<AppStore>()(
+  devtools(
+    persist(
+      (set) => ({
+        ...createUISlice(set),
+        ...createUserSlice(set),
+        ...createNotificationSlice(set),
+      }),
+      {
+        name: 'app-store',
+        partialize: (state) => ({
+          // Only persist theme and user
+          theme: state.theme,
+          user: state.user,
+        }),
+      }
+    )
+  )
+);
+
+// Selectors with shallow comparison
+import { shallow } from 'zustand/shallow';
+
+export const useUI = () =>
+  useAppStore(
+    (state) => ({
+      isSidebarOpen: state.isSidebarOpen,
+      theme: state.theme,
+      toggleSidebar: state.toggleSidebar,
+      setTheme: state.setTheme,
+    }),
+    shallow
+  );
+
+export const useUser = () =>
+  useAppStore(
+    (state) => ({
+      user: state.user,
+      setUser: state.setUser,
+      logout: state.logout,
+    }),
+    shallow
+  );
+
+export const useNotifications = () =>
+  useAppStore(
+    (state) => ({
+      notifications: state.notifications,
+      addNotification: state.addNotification,
+      removeNotification: state.removeNotification,
+    }),
+    shallow
+  );
+```
+
+---
+
+### Example: Custom Hook Pattern
+
+```typescript
+// hooks/use-pagination.ts
+import { useState, useMemo } from 'react';
+
+interface UsePaginationProps {
+  totalItems: number;
+  itemsPerPage: number;
+  initialPage?: number;
+}
+
+export function usePagination({ totalItems, itemsPerPage, initialPage = 1 }: UsePaginationProps) {
+  const [currentPage, setCurrentPage] = useState(initialPage);
+
+  const totalPages = useMemo(
+    () => Math.ceil(totalItems / itemsPerPage),
+    [totalItems, itemsPerPage]
+  );
+
+  const startIndex = useMemo(
+    () => (currentPage - 1) * itemsPerPage,
+    [currentPage, itemsPerPage]
+  );
+
+  const endIndex = useMemo(
+    () => Math.min(startIndex + itemsPerPage, totalItems),
+    [startIndex, itemsPerPage, totalItems]
+  );
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const goToPrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+  const goToFirstPage = () => setCurrentPage(1);
+  const goToLastPage = () => setCurrentPage(totalPages);
+
+  return {
+    currentPage,
+    totalPages,
+    startIndex,
+    endIndex,
+    goToPage,
+    goToNextPage,
+    goToPrevPage,
+    goToFirstPage,
+    goToLastPage,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1,
+  };
+}
+
+// Usage
+function ProductList({ products }: { products: Product[] }) {
+  const { currentPage, totalPages, startIndex, endIndex, goToPage, hasNextPage, hasPrevPage } =
+    usePagination({
+      totalItems: products.length,
+      itemsPerPage: 10,
+    });
+
+  const visibleProducts = products.slice(startIndex, endIndex);
+
+  return (
+    <div>
+      <ul>
+        {visibleProducts.map((product) => (
+          <li key={product.id}>{product.name}</li>
+        ))}
+      </ul>
+
+      <div>
+        <button onClick={() => goToPage(currentPage - 1)} disabled={!hasPrevPage}>
+          Previous
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button onClick={() => goToPage(currentPage + 1)} disabled={!hasNextPage}>
+          Next
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### Example: Error Boundary with Retry
+
+```typescript
+// components/error-boundary.tsx
+import { Component, ErrorInfo, ReactNode } from 'react';
+import { Button } from './button';
+
+interface Props {
+  children: ReactNode;
+  fallback?: (error: Error, reset: () => void) => ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+}
+
+interface State {
+  hasError: boolean;
+  error: Error | null;
+}
+
+export class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Error boundary caught:', error, errorInfo);
+    this.props.onError?.(error, errorInfo);
+  }
+
+  reset = () => {
+    this.setState({ hasError: false, error: null });
+  };
+
+  render() {
+    if (this.state.hasError && this.state.error) {
+      if (this.props.fallback) {
+        return this.props.fallback(this.state.error, this.reset);
+      }
+
+      return (
+        <div role="alert" style={{ padding: '2rem', textAlign: 'center' }}>
+          <h2>Something went wrong</h2>
+          <pre style={{ color: 'red', marginTop: '1rem' }}>{this.state.error.message}</pre>
+          <Button onClick={this.reset} style={{ marginTop: '1rem' }}>
+            Try again
+          </Button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// Usage with custom fallback
+<ErrorBoundary
+  fallback={(error, reset) => (
+    <div>
+      <h1>Oops!</h1>
+      <p>{error.message}</p>
+      <button onClick={reset}>Retry</button>
+    </div>
+  )}
+  onError={(error) => {
+    // Send to error tracking service
+    console.error('Error tracked:', error);
+  }}
+>
+  <App />
+</ErrorBoundary>;
+```
+
+---
+
+### Example: Testing Library Pattern (Complete)
+
+```typescript
+// product-form.test.tsx
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/mocks/server';
+import { ProductForm } from './product-form';
+
+describe('ProductForm', () => {
+  test('submits valid product data', async () => {
+    const user = userEvent.setup();
+    const onSuccess = vi.fn();
+
+    render(<ProductForm onSuccess={onSuccess} />);
+
+    // Fill form
+    await user.type(screen.getByLabelText(/product name/i), 'New Product');
+    await user.type(screen.getByLabelText(/price/i), '29.99');
+    await user.type(screen.getByLabelText(/description/i), 'A great product');
+
+    // Submit
+    await user.click(screen.getByRole('button', { name: /submit/i }));
+
+    // Assert API was called
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'New Product',
+          price: 29.99,
+          description: 'A great product',
+        })
+      );
+    });
+  });
+
+  test('shows validation errors for empty fields', async () => {
+    const user = userEvent.setup();
+    render(<ProductForm onSuccess={vi.fn()} />);
+
+    await user.click(screen.getByRole('button', { name: /submit/i }));
+
+    expect(await screen.findByText(/name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/price is required/i)).toBeInTheDocument();
+  });
+
+  test('handles API errors', async () => {
+    const user = userEvent.setup();
+
+    server.use(
+      http.post('/api/products', () => {
+        return new HttpResponse(null, { status: 500 });
+      })
+    );
+
+    render(<ProductForm onSuccess={vi.fn()} />);
+
+    await user.type(screen.getByLabelText(/product name/i), 'New Product');
+    await user.type(screen.getByLabelText(/price/i), '29.99');
+    await user.click(screen.getByRole('button', { name: /submit/i }));
+
+    expect(await screen.findByText(/failed to create product/i)).toBeInTheDocument();
+  });
+
+  test('disables submit button while submitting', async () => {
+    const user = userEvent.setup();
+    render(<ProductForm onSuccess={vi.fn()} />);
+
+    await user.type(screen.getByLabelText(/product name/i), 'New Product');
+    await user.type(screen.getByLabelText(/price/i), '29.99');
+
+    const submitButton = screen.getByRole('button', { name: /submit/i });
+    await user.click(submitButton);
+
+    expect(submitButton).toBeDisabled();
+  });
+
+  test('is keyboard accessible', async () => {
+    const user = userEvent.setup();
+    const onSuccess = vi.fn();
+    render(<ProductForm onSuccess={onSuccess} />);
+
+    // Tab through form
+    await user.tab();
+    expect(screen.getByLabelText(/product name/i)).toHaveFocus();
+
+    await user.keyboard('Product Name');
+    await user.tab();
+    expect(screen.getByLabelText(/price/i)).toHaveFocus();
+
+    await user.keyboard('19.99');
+    await user.tab();
+    expect(screen.getByLabelText(/description/i)).toHaveFocus();
+
+    await user.keyboard('Description');
+    await user.tab();
+    expect(screen.getByRole('button', { name: /submit/i })).toHaveFocus();
+
+    // Submit with Enter
+    await user.keyboard('{Enter}');
+
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalled();
+    });
+  });
+});
+```
+
+---
+
+## Critical Do's
+
+### ✅ Do: Use React Query for Server State
+
+```typescript
+// ✅ GOOD: React Query handles caching, revalidation, loading states
+function ProductList() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['products'],
+    queryFn: () => apiClient.getProducts(),
+  });
+
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage error={error} />;
+
+  return <ul>{data?.map((product) => <li key={product.id}>{product.name}</li>)}</ul>;
+}
+```
+
+### ✅ Do: Validate Environment Variables with Zod
+
+```typescript
+// ✅ GOOD: Type-safe environment variables
+import { z } from 'zod';
+
+const envSchema = z.object({
+  NEXT_PUBLIC_API_URL: z.string().url(),
+  NEXT_PUBLIC_ENVIRONMENT: z.enum(['development', 'staging', 'production']),
+});
+
+export const env = envSchema.parse({
+  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  NEXT_PUBLIC_ENVIRONMENT: process.env.NEXT_PUBLIC_ENVIRONMENT,
+});
+
+// Usage: env.NEXT_PUBLIC_API_URL (typed!)
+```
+
+### ✅ Do: Forward Refs on Interactive Elements
+
+```typescript
+// ✅ GOOD: Ref forwarding for focus management
+export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+  return <input ref={ref} {...props} />;
+});
+
+// Usage
+function Form() {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  return <Input ref={inputRef} />;
+}
+```
+
+### ✅ Do: Use MSW for API Mocking
+
+```typescript
+// ✅ GOOD: MSW for realistic API mocking
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
+
+const server = setupServer(
+  http.get('/api/products', () => {
+    return HttpResponse.json([{ id: '1', name: 'Product 1' }]);
+  })
+);
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+```
+
+---
+
+## Critical Don'ts
+
+### ❌ Don't: Store Server Data in Zustand
+
+```typescript
+// ❌ BAD: Manually managing server state
+const useProductStore = create((set) => ({
+  products: [],
+  loading: false,
+  fetchProducts: async () => {
+    set({ loading: true });
+    const products = await apiClient.getProducts();
+    set({ products, loading: false });
+  },
+}));
+
+// ✅ GOOD: Use React Query for server state
+const { data: products, isLoading } = useQuery({
+  queryKey: ['products'],
+  queryFn: () => apiClient.getProducts(),
+});
+```
+
+### ❌ Don't: Skip Shallow for Multiple Zustand Selects
+
+```typescript
+// ❌ BAD: Causes unnecessary re-renders
+const { user, theme } = useAppStore((state) => ({
+  user: state.user,
+  theme: state.theme,
+}));
+// Re-renders on ANY state change!
+
+// ✅ GOOD: Use shallow comparison
+import { shallow } from 'zustand/shallow';
+
+const { user, theme } = useAppStore(
+  (state) => ({
+    user: state.user,
+    theme: state.theme,
+  }),
+  shallow
+);
+// Only re-renders when user or theme change!
+```
+
+### ❌ Don't: Use `any` Without Justification
+
+```typescript
+// ❌ BAD: No type safety
+function processData(data: any) {
+  return data.map((item: any) => item.name);
+}
+
+// ✅ GOOD: Proper types
+interface Item {
+  id: string;
+  name: string;
+}
+
+function processData(data: Item[]): string[] {
+  return data.map((item) => item.name);
+}
+```
+
+### ❌ Don't: Memoize Everything
+
+```typescript
+// ❌ BAD: Unnecessary memoization overhead
+function Component({ name }: { name: string }) {
+  const uppercaseName = useMemo(() => name.toUpperCase(), [name]);
+  const length = useMemo(() => name.length, [name]);
+
+  return (
+    <div>
+      {uppercaseName} ({length})
+    </div>
+  );
+}
+
+// ✅ GOOD: Simple calculations don't need memoization
+function Component({ name }: { name: string }) {
+  const uppercaseName = name.toUpperCase(); // Fast enough!
+  const length = name.length;
+
+  return (
+    <div>
+      {uppercaseName} ({length})
+    </div>
+  );
+}
+```
+
+---
+
+## File-Scoped Commands
+
+### Example: Fast Feedback Loop
+
+```bash
+# Watch mode for development
+bun vitest watch src/components/button.test.tsx
+
+# Type check while editing
+bun tsc --noEmit --watch
+
+# Lint and fix on save
+bun eslint src/components/button.tsx --fix
+
+# Format on save
+bun prettier --write src/components/button.tsx
+```
+
+### Example: Turborepo Affected Detection
+
+```bash
+# Test only affected packages since main
+bun turbo test --filter=...[origin/main]
+
+# Build only affected packages
+bun turbo build --filter=...[origin/main]
+
+# Example output:
+# • Packages in scope: @repo/ui, @repo/api-client
+# • Packages not in scope: @repo/database (no changes)
+```
+
+### Example: Package-Scoped Operations
+
+```bash
+# Run all checks for specific package
+bun --filter @repo/ui run lint
+bun --filter @repo/ui run type-check
+bun --filter @repo/ui run test
+bun --filter @repo/ui run build
+
+# Run checks for multiple packages
+bun --filter @repo/ui --filter @repo/api-client test
+
+# Run checks for all packages
+bun turbo test
 
 
 
@@ -5161,6 +6709,7 @@ it("should handle errors", async () => {
 **Pattern:** Define task dependencies and caching behavior
 
 **Key concepts:**
+
 - `dependsOn: ["^build"]` - Run dependency tasks first (topological order)
 - `outputs` - Define what files to cache
 - `inputs` - Specify which files trigger cache invalidation
@@ -5197,16 +6746,19 @@ it("should handle errors", async () => {
 ### Caching Strategies
 
 **What gets cached:**
+
 - Build outputs (`dist/`, `.next/`)
 - Test results (when `cache: true`)
 - Lint results
 
 **What doesn't get cached:**
+
 - Dev servers (`cache: false`)
 - Code generation (`cache: false` - generates files)
 - Tasks with side effects
 
 **Cache invalidation triggers:**
+
 - Source file changes
 - Dependency changes
 - Environment variable changes (when in `env` array)
@@ -5242,8 +6794,6 @@ it("should handle errors", async () => {
 
 **Why:** Turbo includes env vars in cache key - different values trigger rebuilds
 
-> See examples.md Turborepo Configuration section for complete examples
-
 ---
 
 ## Linting Configuration
@@ -5257,6 +6807,7 @@ it("should handle errors", async () => {
 **Pattern:** Shared base config extended by apps and packages
 
 **Structure:**
+
 ```
 packages/eslint-config/
 ├── base.js           # Base config for all packages
@@ -5270,17 +6821,20 @@ packages/eslint-config/
 ### Key Features
 
 **ESLint 9 flat config:**
+
 - New configuration format (replaces `.eslintrc`)
 - Simpler, more flexible
 - Better TypeScript support
 
 **Plugins used:**
+
 - `@typescript-eslint` - TypeScript linting
 - `eslint-config-prettier` - Disable conflicting Prettier rules
 - `eslint-plugin-turbo` - Validate environment variables
 - `eslint-plugin-only-warn` - Convert errors to warnings (better DX)
 
 **Why `only-warn`:**
+
 - Developers aren't blocked by errors
 - Issues are visible but not disruptive
 - CI can still fail on warnings if needed
@@ -5288,11 +6842,13 @@ packages/eslint-config/
 ### ESLint vs Biome (2025)
 
 **Current choice: ESLint 9**
+
 - Mature ecosystem
 - Extensive plugin support
 - Good TypeScript integration
 
 **Biome (emerging alternative):**
+
 - ✅ Extremely fast (Rust-based)
 - ✅ Combined linter + formatter
 - ✅ Drop-in Prettier replacement
@@ -5300,11 +6856,10 @@ packages/eslint-config/
 - ❌ Fewer plugins
 
 **Recommendation:**
+
 - Stick with ESLint for now (mature, stable)
 - Monitor Biome adoption (may switch in 2025-2026)
 - Consider Biome for greenfield projects
-
-> See examples.md Linting Configuration section for configuration examples
 
 ---
 
@@ -5331,26 +6886,31 @@ packages/eslint-config/
 ### Format Settings Explained
 
 **Line width:** `100` characters
+
 - Balances readability and screen width
 - Works well with side-by-side diffs
 - Alternative: `120` for wider screens
 
 **Quotes:** Double quotes (`"`)
+
 - Consistent with JSON
 - Fewer escapes in JSX
 - Alternative: Single quotes (`'`) for smaller bundles
 
 **Semicolons:** Required
+
 - Explicit statement termination
 - Avoids ASI issues
 - Alternative: No semicolons (modern style)
 
 **Trailing commas:** All
+
 - Cleaner git diffs
 - Easier to reorder items
 - Required for multi-line
 
 **Arrow parens:** Always
+
 - Consistent with multi-param functions
 - Easier to add params later
 
@@ -5392,22 +6952,23 @@ indent_size = 2
 ### Prettier vs Biome
 
 **Current choice: Prettier**
+
 - Industry standard
 - Extensive language support
 - Battle-tested
 
 **Biome alternative:**
+
 - ~20x faster than Prettier
 - Combined linter + formatter
 - Compatible with Prettier config
 - Growing adoption
 
 **When to switch:**
+
 - Large monorepos (speed matters)
 - Greenfield projects
 - When Biome plugin ecosystem matures
-
-> See examples.md Formatting section for configuration examples
 
 ---
 
@@ -5438,6 +6999,7 @@ cd apps/client-react && bun run test --watch=false
 **Pattern:** Per-package configuration runs ESLint with auto-fix on staged TypeScript and SCSS files.
 
 **What runs on commit:**
+
 - ESLint with auto-fix
 - Prettier formatting (via ESLint integration)
 - Only on staged files (fast!)
@@ -5445,11 +7007,13 @@ cd apps/client-react && bun run test --watch=false
 ### What to Run Pre-commit
 
 **Recommended (fast):**
+
 - ✅ Linting with auto-fix
 - ✅ Formatting
 - ✅ Type checking (--noEmit, fast)
 
 **NOT recommended (slow):**
+
 - ❌ Full test suite (run in pre-push or CI)
 - ❌ Full build (too slow)
 - ❌ E2E tests (run in CI)
@@ -5462,13 +7026,8 @@ cd apps/client-react && bun run test --watch=false
 // lint-staged.config.mjs
 export default {
   "*.{ts,tsx}": (filenames) => {
-    const testFiles = filenames
-      .filter(f => f.includes('.test.'))
-      .map(f => `bun test ${f}`)
-    return [
-      "eslint --fix",
-      ...testFiles,
-    ];
+    const testFiles = filenames.filter((f) => f.includes(".test.")).map((f) => `bun test ${f}`);
+    return ["eslint --fix", ...testFiles];
   },
 };
 ```
@@ -5477,14 +7036,9 @@ export default {
 
 ```javascript
 export default {
-  "*.{ts,tsx}": [
-    "eslint --fix",
-    () => "tsc --noEmit --incremental",
-  ],
+  "*.{ts,tsx}": ["eslint --fix", () => "tsc --noEmit --incremental"],
 };
 ```
-
-> See examples.md Pre-commit Hooks section for examples
 
 ---
 
@@ -5497,6 +7051,7 @@ export default {
 ### Shared Config Pattern
 
 **Structure:**
+
 ```
 packages/typescript-config/
 ├── base.json              # Common settings for all packages
@@ -5558,11 +7113,10 @@ packages/typescript-config/
 ```
 
 **Benefits:**
+
 - Clean imports: `import { Button } from "@components/button"`
 - No relative path hell: No `../../../components`
 - Easy refactoring
-
-> See core patterns code-conventions Import/Export Patterns section for import patterns
 
 ---
 
@@ -5581,6 +7135,7 @@ packages/typescript-config/
 ### Why Bun?
 
 **Benefits:**
+
 - ⚡ Extremely fast installs (3-10x faster than npm/yarn)
 - 🔧 Native TypeScript support
 - 🎯 Compatible with npm packages
@@ -5588,6 +7143,7 @@ packages/typescript-config/
 - 🔨 Built-in bundler
 
 **Alternatives:**
+
 - **npm** - Slowest, but universal
 - **yarn** - Faster, PnP mode
 - **pnpm** - Efficient disk usage, fast
@@ -5604,6 +7160,7 @@ packages/typescript-config/
 ```
 
 **Benefits:**
+
 - Shared dependencies across packages
 - Hoist common dependencies
 - Link local packages automatically
@@ -5630,11 +7187,13 @@ packages/typescript-config/
 ### Why Syncpack?
 
 **Problem:**
+
 - Different packages use different versions of React
 - `@types/react` version mismatch
 - Duplicate dependencies in bundle
 
 **Solution:**
+
 - Syncpack identifies version mismatches
 - Auto-fix to use consistent versions
 - Reduces bundle size
@@ -5660,6 +7219,7 @@ $ bun run deps:fix
 ### Bundle Analysis
 
 **Tools:**
+
 - `rollup-plugin-visualizer` - Vite/Rollup
 - `@next/bundle-analyzer` - Next.js
 - `webpack-bundle-analyzer` - Webpack
@@ -5674,6 +7234,7 @@ bun run build --analyze
 ### Code Splitting
 
 **Patterns:**
+
 - Route-based splitting (automatic in Next.js)
 - Component lazy loading with `React.lazy()`
 - Vendor chunk splitting
@@ -5682,6 +7243,7 @@ bun run build --analyze
 ### Tree Shaking
 
 **Requirements:**
+
 - ES modules (not CommonJS)
 - Named exports (not default)
 - Side-effect-free code
@@ -5722,11 +7284,10 @@ Or specify files with side effects:
 ```
 
 **Monitor:**
+
 - Initial bundle < 200KB (gzip)
 - Largest chunk < 500KB
 - Total bundle < 1MB
-
-> See examples.md Build Optimization section for implementation examples
 
 
 ---
@@ -6796,6 +8357,7 @@ This document outlines **recommended best practices** for CI/CD pipelines in a T
 **Pattern: Separate workflows for different concerns**
 
 **Recommended workflows:**
+
 - `ci.yml` - Continuous integration (lint, test, type-check, build)
 - `preview.yml` - Preview deployments for pull requests
 - `deploy.yml` - Production deployment from main branch
@@ -6840,11 +8402,13 @@ jobs:
 4. **TypeScript incremental builds** - `tsconfig.tsbuildinfo`
 
 **Cache invalidation:**
+
 - Dependencies: Hash of `bun.lockb`
 - Source code: Turborepo handles automatically
 - Build cache: Based on input files
 
 **Cache strategy:**
+
 ```yaml
 - uses: actions/cache@v4
   with:
@@ -6859,11 +8423,13 @@ jobs:
 **Pattern: Use GitHub secrets for sensitive data**
 
 **Types of variables:**
+
 - **Secrets** - API keys, tokens (encrypted, not visible in logs)
 - **Variables** - Non-sensitive config (visible in logs)
 - **Environment-specific** - Different values per environment
 
 **Example:**
+
 ```yaml
 env:
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -6872,12 +8438,11 @@ env:
 ```
 
 **Best practices:**
+
 - Never commit secrets to repository
 - Use different secrets per environment (staging vs production)
 - Rotate secrets regularly
 - Use least-privilege access (don't share prod secrets with preview deploys)
-
-> See examples.md Pipeline Configuration section for implementation
 
 ---
 
@@ -6906,6 +8471,7 @@ turbo run lint --filter=@repo/ui... --filter=...@repo/api
 ```
 
 **Syntax breakdown:**
+
 - `...` - Include dependents
 - `[origin/main]` - Compare against main branch
 - `^` - Include dependencies
@@ -6913,16 +8479,19 @@ turbo run lint --filter=@repo/ui... --filter=...@repo/api
 ### PR vs Main Branch Strategy
 
 **Pull Requests:**
+
 - Run affected tests: `--filter=...[origin/main]`
 - Only test what changed + dependents
 - Fast feedback loop
 
 **Main branch:**
+
 - Run full test suite: `turbo run test`
 - Ensure everything still works together
 - Catch integration issues
 
 **Why:**
+
 - PRs need fast feedback (< 5 minutes ideal)
 - Main branch needs comprehensive validation
 - Balance speed vs thoroughness
@@ -6932,6 +8501,7 @@ turbo run lint --filter=@repo/ui... --filter=...@repo/api
 **Problem:** New packages have no git history, may be skipped by affected detection
 
 **Solution:**
+
 ```yaml
 # Check if this is a new package
 - name: Detect new packages
@@ -6963,11 +8533,10 @@ turbo run build --filter=@repo/client-next...
 ```
 
 **Benefits:**
+
 - Faster CI (don't build unchanged apps)
 - Faster deployments (only deploy what changed)
 - Reduced resource usage
-
-> See examples.md Affected Detection section for implementation
 
 ---
 
@@ -6980,12 +8549,14 @@ turbo run build --filter=@repo/client-next...
 ### Cache Providers
 
 **Vercel (recommended):**
+
 - ✅ Free for Turborepo users
 - ✅ Zero configuration
 - ✅ Global CDN
 - ✅ Team sharing built-in
 
 **Self-hosted alternatives:**
+
 - **AWS S3** - Pay per storage/transfer
 - **Google Cloud Storage** - Similar to S3
 - **Custom server** - Full control, more work
@@ -6993,6 +8564,7 @@ turbo run build --filter=@repo/client-next...
 ### Setup Remote Caching
 
 **Step 1: Sign up for Vercel**
+
 ```bash
 bun add -g vercel
 vercel login
@@ -7000,12 +8572,14 @@ vercel link
 ```
 
 **Step 2: Get team/token**
+
 ```bash
 # Get your team ID and token
 vercel team ls
 ```
 
 **Step 3: Configure CI**
+
 ```yaml
 env:
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -7013,6 +8587,7 @@ env:
 ```
 
 **Step 4: Enable in turbo.json**
+
 ```json
 {
   "remoteCache": {
@@ -7024,18 +8599,21 @@ env:
 ### Cache Hit Optimization
 
 **What affects cache hits:**
+
 - Input files (source code, configs)
 - Environment variables (declared in `turbo.json`)
 - Dependencies (package.json, lockfile)
 - Task outputs
 
 **Best practices:**
+
 - Declare all env vars in `turbo.json` (cache invalidation)
 - Use deterministic builds (no timestamps in output)
 - Don't cache tasks with side effects (`cache: false`)
 - Use granular tasks (separate lint/test/build)
 
 **Cache hit rate:**
+
 - 80%+ is excellent
 - 50-80% is good
 - <50% needs optimization
@@ -7043,12 +8621,14 @@ env:
 ### Cache Invalidation
 
 **Automatic invalidation:**
+
 - Source file changes
 - Dependency updates
 - Environment variable changes (if declared)
 - Turborepo version changes
 
 **Manual invalidation:**
+
 ```bash
 # Clear local cache
 turbo run build --force
@@ -7056,8 +8636,6 @@ turbo run build --force
 # Bypass remote cache
 TURBO_FORCE=true turbo run build
 ```
-
-> See examples.md Remote Caching section for implementation
 
 ---
 
@@ -7070,14 +8648,17 @@ TURBO_FORCE=true turbo run build
 **Minimum required checks:**
 
 1. **Linting** - Code style, no errors
+
    - `turbo run lint`
    - Must pass, no warnings allowed in CI
 
 2. **Type checking** - TypeScript compilation
+
    - `turbo run type-check` (or `tsc --noEmit`)
    - Zero TypeScript errors
 
 3. **Tests** - Unit and integration tests
+
    - `turbo run test`
    - All tests must pass
 
@@ -7085,23 +8666,21 @@ TURBO_FORCE=true turbo run build
    - `turbo run build`
    - Build must complete without errors
 
-**Optional but recommended:**
-5. **Coverage thresholds** - Minimum test coverage
-6. **Bundle size check** - Prevent bundle bloat
-7. **Security audit** - Check for vulnerabilities
-8. **Accessibility audit** - Check for a11y issues
+**Optional but recommended:** 5. **Coverage thresholds** - Minimum test coverage 6. **Bundle size check** - Prevent bundle bloat 7. **Security audit** - Check for vulnerabilities 8. **Accessibility audit** - Check for a11y issues
 
 ### Coverage Thresholds
 
 **Pattern: Enforce minimum test coverage**
 
 **Recommended thresholds:**
+
 - Statements: 80%
 - Branches: 75%
 - Functions: 80%
 - Lines: 80%
 
 **Configuration:**
+
 ```json
 {
   "coverageThreshold": {
@@ -7116,6 +8695,7 @@ TURBO_FORCE=true turbo run build
 ```
 
 **Why:**
+
 - Prevents untested code from merging
 - Encourages comprehensive testing
 - Catches regression in coverage
@@ -7125,6 +8705,7 @@ TURBO_FORCE=true turbo run build
 **GitHub branch protection (recommended):**
 
 **For `main` branch:**
+
 - ✅ Require pull request before merging
 - ✅ Require status checks to pass
   - Lint
@@ -7137,6 +8718,7 @@ TURBO_FORCE=true turbo run build
 - ✅ Require code review (1+ approvers)
 
 **For `develop` branch:**
+
 - ✅ Require pull request
 - ✅ Require status checks
 - ❌ Require code review (optional, for faster iteration)
@@ -7144,23 +8726,24 @@ TURBO_FORCE=true turbo run build
 ### Automated vs Manual Gates
 
 **Automated gates:**
+
 - Lint, test, type-check, build (always automated)
 - Coverage thresholds
 - Bundle size checks
 - Security scans
 
 **Manual gates:**
+
 - Code review (human judgment)
 - QA testing (exploratory testing)
 - Product approval (feature validation)
 - Security review (sensitive changes)
 
 **Best practice:**
+
 - Automate everything possible
 - Use manual gates for human judgment only
 - Don't block on manual gates for hotfixes
-
-> See examples.md Quality Gates section for implementation
 
 ---
 
@@ -7184,6 +8767,7 @@ feature/* → Preview (automatic on PR)
 ```
 
 **Why:**
+
 - Fast feedback with preview deploys
 - Staging mirrors production config
 - Production requires approval (safety)
@@ -7191,11 +8775,13 @@ feature/* → Preview (automatic on PR)
 **Alternative strategies:**
 
 **Trunk-based development:**
+
 - All commits to `main`
 - Deploy to production automatically
 - Feature flags for incomplete features
 
 **GitFlow:**
+
 - `develop` → staging
 - `release/*` → UAT
 - `main` → production (tag-based)
@@ -7209,11 +8795,13 @@ Code → Build → Test → Deploy Staging → Test Staging → Deploy Prod
 ```
 
 **Why:**
+
 - Same build artifact across environments
 - Reduces "works on my machine" issues
 - Faster deployments (no rebuild)
 
 **Implementation:**
+
 - Build once in CI
 - Upload artifact
 - Download and deploy to each environment
@@ -7226,10 +8814,12 @@ Code → Build → Test → Deploy Staging → Test Staging → Deploy Prod
 **Strategies:**
 
 1. **Revert commit** - Git revert, trigger new deploy
+
    - Simple, clean git history
    - Slow (requires new build)
 
 2. **Redeploy previous version** - Vercel/Netlify built-in
+
    - Fast (instant rollback)
    - Easy with platforms like Vercel
 
@@ -7239,6 +8829,7 @@ Code → Build → Test → Deploy Staging → Test Staging → Deploy Prod
    - More complex setup
 
 **Best practice:**
+
 - Use platform rollback for speed (Vercel, Netlify)
 - Test rollback procedure regularly
 - Monitor post-deployment (catch issues early)
@@ -7250,28 +8841,30 @@ Code → Build → Test → Deploy Staging → Test Staging → Deploy Prod
 **Pattern: Deploy every PR to unique URL**
 
 **Benefits:**
+
 - Visual review before merge
 - Test on production-like environment
 - Share with stakeholders
 - Catch issues early
 
 **Providers:**
+
 - **Vercel** - Automatic preview deploys for Next.js
 - **Netlify** - Automatic deploy previews
 - **Cloudflare Pages** - Preview deployments
 - **Custom** - Deploy to subdomain per PR
 
 **URL patterns:**
+
 - `pr-123.example.com`
 - `feature-auth.staging.example.com`
 - `pr-123-client-next.vercel.app`
 
 **Cleanup:**
+
 - Delete preview deploys after PR merge/close
 - Saves costs
 - Reduces clutter
-
-> See examples.md Deployment Workflows section for implementation
 
 ---
 
@@ -7282,12 +8875,14 @@ Code → Build → Test → Deploy Staging → Test Staging → Deploy Prod
 ### Secret Management
 
 **GitHub Secrets:**
+
 - Encrypted at rest
 - Masked in logs
 - Per-environment secrets
 - Audit log
 
 **Best practices:**
+
 - Use least-privilege access (separate secrets per environment)
 - Rotate secrets regularly (quarterly minimum)
 - Don't share secrets across repos
@@ -7298,16 +8893,19 @@ Code → Build → Test → Deploy Staging → Test Staging → Deploy Prod
 **Automated scanning:**
 
 **Dependabot:**
+
 - Automatic security updates
 - Creates PRs for vulnerable dependencies
 - Free for GitHub
 
 **Alternative tools:**
+
 - **Snyk** - Comprehensive security scanning
 - **npm audit** - Built-in npm vulnerability check
 - **bun audit** - Bun vulnerability scanning
 
 **Best practice:**
+
 - Enable Dependabot
 - Review security PRs within 24 hours
 - Auto-merge low-risk patches
@@ -7315,11 +8913,13 @@ Code → Build → Test → Deploy Staging → Test Staging → Deploy Prod
 ### Code Scanning
 
 **GitHub Advanced Security:**
+
 - CodeQL scanning (free for public repos)
 - Secret scanning
 - Dependency review
 
 **Configuration:**
+
 ```yaml
 # .github/workflows/codeql.yml
 - uses: github/codeql-action/analyze@v3
@@ -7334,6 +8934,7 @@ Code → Build → Test → Deploy Staging → Test Staging → Deploy Prod
 ### Parallelization
 
 **Strategies:**
+
 - Run independent jobs in parallel (lint || test || type-check)
 - Use matrix builds for multiple Node/Bun versions
 - Split test suites (unit || integration || e2e)
@@ -7341,11 +8942,13 @@ Code → Build → Test → Deploy Staging → Test Staging → Deploy Prod
 ### Resource Management
 
 **Runners:**
+
 - Use GitHub-hosted runners (free, no maintenance)
 - Use self-hosted runners for speed (private repos, large teams)
 - Use larger runners for build-heavy tasks
 
 **Concurrency:**
+
 ```yaml
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -7353,29 +8956,31 @@ concurrency:
 ```
 
 **Why:**
+
 - Cancels outdated runs (saves resources)
 - Only run latest commit
 
 ### Monitoring and Metrics
 
 **Track:**
+
 - CI runtime per workflow
 - Cache hit rate
 - Failure rate per check
 - Time to deploy
 
 **Tools:**
+
 - GitHub Insights (built-in)
 - Datadog CI Visibility
 - CircleCI Insights
 
 **Targets:**
+
 - CI runtime: < 5 minutes
 - Cache hit rate: > 80%
 - Failure rate: < 5%
 - Time to deploy: < 10 minutes
-
-> See examples.md Performance Optimization section for implementation
 
 ---
 
@@ -7399,15 +9004,18 @@ concurrency:
 ## Resources
 
 **Official documentation:**
+
 - GitHub Actions: https://docs.github.com/en/actions
 - Turborepo CI/CD: https://turbo.build/repo/docs/ci
 - Vercel Deployment: https://vercel.com/docs/deployments
 
 **Tools:**
+
 - Bun CI setup: https://bun.sh/docs/install/ci
 - Dependabot: https://docs.github.com/en/code-security/dependabot
 
 **Best practices:**
+
 - GitHub Actions Best Practices: https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
 
 
@@ -8446,7 +10054,7 @@ jobs:
 
 # Environment Management
 
-> **Quick Guide:** Per-app .env files (apps/client-next/.env). Framework-specific prefixes (NEXT_PUBLIC_*, VITE_*). Zod validation at startup. Maintain .env.example templates. Never commit secrets (.gitignore). Environment-based feature flags.
+> **Quick Guide:** Per-app .env files (apps/client-next/.env). Framework-specific prefixes (NEXT*PUBLIC*\_, VITE\_\_). Zod validation at startup. Maintain .env.example templates. Never commit secrets (.gitignore). Environment-based feature flags.
 
 **ACTUAL IMPLEMENTATION: Per-app `.env` files with Zod validation**
 
@@ -8487,21 +10095,25 @@ packages/
 **File types:**
 
 1. **`.env`** - Default development values (committed for apps, gitignored for sensitive packages)
+
    - Contains non-sensitive defaults
    - Used for local development
    - Framework-specific prefixes for client-side variables
 
 2. **`.env.example`** - Documentation template (committed)
+
    - Shows all required variables (no values)
    - Includes comments explaining each variable
    - Used for onboarding new developers
 
 3. **`.env.local`** - Local developer overrides (gitignored)
+
    - Personal development settings
    - Never committed
    - Takes precedence over `.env`
 
 4. **`.env.production`** - Production configuration (committed or in CI secrets)
+
    - Production-specific values (URLs, feature flags)
    - Sensitive values stored in CI secrets
    - Loaded during production builds
@@ -8527,6 +10139,7 @@ packages/
 4. `.env`
 
 **Best practice:**
+
 - Use `.env` for defaults (committed)
 - Use `.env.local` for personal overrides (gitignored)
 - Use `.env.production` for production config (committed or CI secrets)
@@ -8540,8 +10153,6 @@ Per-app prevents conflicts, clarifies ownership. Root-level causes shared variab
 
 **Exception:** Shared variables can go in `turbo.json` `env` array
 
-> See examples.md File Hierarchy section for implementation
-
 ---
 
 ## Naming Conventions
@@ -8553,6 +10164,7 @@ Per-app prevents conflicts, clarifies ownership. Root-level causes shared variab
 **Mandatory conventions:**
 
 1. **SCREAMING_SNAKE_CASE** - All environment variables must use uppercase with underscores
+
    ```bash
    # ✅ GOOD
    NEXT_PUBLIC_API_URL=https://api.example.com
@@ -8564,6 +10176,7 @@ Per-app prevents conflicts, clarifies ownership. Root-level causes shared variab
    ```
 
 2. **Descriptive names** - Variable names should clearly indicate purpose
+
    ```bash
    # ✅ GOOD
    NEXT_PUBLIC_API_URL=https://api.example.com
@@ -8575,6 +10188,7 @@ Per-app prevents conflicts, clarifies ownership. Root-level causes shared variab
    ```
 
 3. **Consistent prefixes** - Use framework prefixes for client-side variables
+
    ```bash
    # Next.js - NEXT_PUBLIC_*
    NEXT_PUBLIC_API_URL=https://api.example.com
@@ -8590,6 +10204,7 @@ Per-app prevents conflicts, clarifies ownership. Root-level causes shared variab
 **Next.js variables:**
 
 - **`NEXT_PUBLIC_*`** - Client-side accessible (embedded in bundle)
+
   - Use for: API URLs, public keys, feature flags
   - Avoid: Secrets, API keys, tokens
 
@@ -8598,6 +10213,7 @@ Per-app prevents conflicts, clarifies ownership. Root-level causes shared variab
   - Never exposed to client
 
 **Example:**
+
 ```bash
 # Client-side (embedded in JavaScript bundle)
 NEXT_PUBLIC_API_URL=https://api.example.com
@@ -8611,6 +10227,7 @@ API_SECRET_KEY=super-secret-key
 **Vite variables:**
 
 - **`VITE_*`** - Client-side accessible (embedded in bundle)
+
   - Use for: API URLs, public configuration
   - Avoid: Secrets
 
@@ -8650,11 +10267,10 @@ SENTRY_DSN=https://...
 ```
 
 **Benefits:**
+
 - Easier to find related variables
 - Clear separation of concerns
 - Easier to document
-
-> See examples.md Naming Conventions section for implementation
 
 ---
 
@@ -8667,12 +10283,14 @@ SENTRY_DSN=https://...
 **Pattern: Validate environment variables at startup with Zod**
 
 **Why validate:**
+
 - Catch missing variables early (at startup, not runtime)
 - Enforce correct types (URL, number, boolean, enum)
 - Provide helpful error messages
 - Single source of truth for environment schema
 
 **Benefits:**
+
 - ✅ Type safety (TypeScript knows variable types)
 - ✅ Runtime validation (fails fast with clear errors)
 - ✅ Default values (optional variables with defaults)
@@ -8716,11 +10334,10 @@ return schema.parse(env); // Throws cryptic Zod error
 ```
 
 **Benefits:**
+
 - Clear error messages for developers
 - Identifies exactly which variable is invalid
 - Suggests correct format
-
-> See examples.md Type-Safe Environment Variables section for implementation
 
 ---
 
@@ -8771,6 +10388,7 @@ SENTRY_DSN=
 ```
 
 **Template best practices:**
+
 - Group related variables
 - Include comments explaining purpose
 - Show example values
@@ -8794,12 +10412,11 @@ SENTRY_DSN=
    - Validation will catch missing required variables
 
 **Documentation:**
+
 - README should mention environment setup
 - Link to `.env.example` file
 - Document where to get third-party service keys
 - Include troubleshooting guide
-
-> See examples.md Environment File Templates section for implementation
 
 ---
 
@@ -8810,6 +10427,7 @@ SENTRY_DSN=
 ### Secret Management
 
 **What are secrets:**
+
 - API keys, tokens, passwords
 - Database credentials
 - Private keys, certificates
@@ -8817,11 +10435,13 @@ SENTRY_DSN=
 - Encryption keys
 
 **What NOT to commit:**
+
 - ❌ `.env.local` (local secrets)
 - ❌ `.env.production` with real secrets
 - ❌ Any file containing actual credentials
 
 **What to commit:**
+
 - ✅ `.env` with non-sensitive defaults
 - ✅ `.env.example` with placeholders
 - ✅ `.env.production` with variable names only (values in CI)
@@ -8851,16 +10471,19 @@ SENTRY_DSN=
 **Pattern: Store secrets in CI/CD platform**
 
 **GitHub Actions:**
+
 - Use GitHub Secrets (Settings → Secrets and variables → Actions)
 - Access via `${{ secrets.SECRET_NAME }}`
 - Secrets are encrypted and masked in logs
 
 **Vercel:**
+
 - Use Vercel Environment Variables (Project Settings → Environment Variables)
 - Separate values per environment (production, preview, development)
 - Access via CLI: `vercel env add VARIABLE_NAME production`
 
 **Best practices:**
+
 - Use different secrets per environment (staging vs production)
 - Rotate secrets regularly (quarterly minimum)
 - Use least-privilege access (separate secrets for each service)
@@ -8870,11 +10493,13 @@ SENTRY_DSN=
 ### Secret Rotation
 
 **Recommended rotation schedule:**
+
 - **Critical secrets** - Quarterly or on team member departure
 - **API keys** - Annually or on suspicious activity
 - **Passwords** - Every 90 days (or use OAuth)
 
 **Rotation process:**
+
 1. Generate new secret
 2. Add to CI/CD platform
 3. Deploy with new secret
@@ -8891,11 +10516,7 @@ SENTRY_DSN=
 {
   "tasks": {
     "build": {
-      "env": [
-        "NEXT_PUBLIC_API_URL",
-        "NODE_ENV",
-        "DATABASE_URL"
-      ]
+      "env": ["NEXT_PUBLIC_API_URL", "NODE_ENV", "DATABASE_URL"]
     }
   }
 }
@@ -8916,11 +10537,10 @@ SENTRY_DSN=
 ```
 
 **Why:**
+
 - Catches undeclared environment variables at lint time
 - Ensures variables are properly declared in turbo.json
 - Prevents accidental reliance on undeclared variables
-
-> See examples.md Security Best Practices section for implementation
 
 ---
 
@@ -8940,6 +10560,7 @@ NEXT_PUBLIC_FEATURE_AB_TEST=true
 ```
 
 **Usage:**
+
 ```typescript
 const FEATURES = {
   NEW_DASHBOARD: process.env.NEXT_PUBLIC_FEATURE_NEW_DASHBOARD === 'true',
@@ -8954,12 +10575,14 @@ if (FEATURES.NEW_DASHBOARD) {
 ```
 
 **Benefits:**
+
 - Simple to implement
 - No external dependencies
 - Works offline
 - Fast (no API calls)
 
 **Limitations:**
+
 - Requires rebuild to change flags
 - No gradual rollouts (0% or 100%)
 - No user targeting
@@ -8970,6 +10593,7 @@ if (FEATURES.NEW_DASHBOARD) {
 **When to use external service:**
 
 Use services like LaunchDarkly, PostHog, or Unleash when you need:
+
 - Runtime flag toggling (no deploys)
 - Gradual rollouts (5% → 25% → 50% → 100%)
 - User targeting (beta users, specific companies)
@@ -8977,6 +10601,7 @@ Use services like LaunchDarkly, PostHog, or Unleash when you need:
 - Scheduled releases
 
 **Trade-offs:**
+
 - ✅ No deploys needed to toggle flags
 - ✅ Gradual rollouts reduce risk
 - ✅ User targeting for beta testing
@@ -8987,6 +10612,7 @@ Use services like LaunchDarkly, PostHog, or Unleash when you need:
 ### Feature Flag Hygiene
 
 **Best practices:**
+
 - Clean up old flags (remove after full rollout)
 - Document flag dependencies (flag A requires flag B)
 - Test both enabled and disabled states
@@ -8994,12 +10620,11 @@ Use services like LaunchDarkly, PostHog, or Unleash when you need:
 - Monitor flag usage (which flags are actively used)
 
 **Anti-patterns:**
+
 - ❌ Too many nested flags (complex logic)
 - ❌ Flags that never get removed (technical debt)
 - ❌ Flags without documentation
 - ❌ Flags that depend on each other (complex dependencies)
-
-> See examples.md Feature Flags section for implementation
 
 ---
 
@@ -9012,12 +10637,14 @@ Use services like LaunchDarkly, PostHog, or Unleash when you need:
 **Pattern: Single configuration object with environment overrides**
 
 **Why:**
+
 - Centralized configuration
 - Type-safe access
 - Easy to test
 - Clear environment differences
 
 **Structure:**
+
 1. Base configuration (shared across environments)
 2. Environment-specific overrides (development, staging, production)
 3. Merge into single config object
@@ -9027,17 +10654,20 @@ Use services like LaunchDarkly, PostHog, or Unleash when you need:
 **Common configuration categories:**
 
 1. **API Configuration**
+
    - Base URL
    - Timeout
    - Retry attempts
    - Rate limits
 
 2. **Cache Configuration**
+
    - TTL (time to live)
    - Max size
    - Eviction policy
 
 3. **Feature Configuration**
+
    - Feature flags
    - Analytics
    - Error tracking
@@ -9052,18 +10682,17 @@ Use services like LaunchDarkly, PostHog, or Unleash when you need:
 **Pattern: Detect environment from env variable**
 
 ```typescript
-const ENV = process.env.NODE_ENV || 'development';
-const IS_PRODUCTION = ENV === 'production';
-const IS_DEVELOPMENT = ENV === 'development';
-const IS_TEST = ENV === 'test';
+const ENV = process.env.NODE_ENV || "development";
+const IS_PRODUCTION = ENV === "production";
+const IS_DEVELOPMENT = ENV === "development";
+const IS_TEST = ENV === "test";
 ```
 
 **Next.js environments:**
+
 - `development` - Local development (`next dev`)
 - `production` - Production build (`next build` + `next start`)
 - `test` - Testing environment (Vitest, Jest)
-
-> See examples.md Configuration by Environment section for implementation
 
 ---
 
@@ -9087,16 +10716,19 @@ const IS_TEST = ENV === 'test';
 ## Resources
 
 **Official documentation:**
+
 - Next.js Environment Variables: https://nextjs.org/docs/app/building-your-application/configuring/environment-variables
 - Vite Environment Variables: https://vitejs.dev/guide/env-and-mode.html
 - Turborepo Environment Variables: https://turbo.build/repo/docs/handbook/environment-variables
 
 **Tools:**
+
 - Zod validation: https://zod.dev/
 - dotenv: https://github.com/motdotla/dotenv
 - TruffleHog (secret scanning): https://github.com/trufflesecurity/trufflehog
 
 **Feature flags:**
+
 - LaunchDarkly: https://launchdarkly.com/
 - PostHog: https://posthog.com/
 - Unleash: https://www.getunleash.io/
@@ -10173,6 +11805,7 @@ This document compiles all anti-patterns identified across the frontend standard
 ## State Management Anti-Patterns
 
 **❌ NEVER:**
+
 - Store server data in Zustand (use React Query instead)
 - Store client UI state in React Query (use Zustand instead)
 - Create unnecessary object references in Zustand selectors (causes re-renders)
@@ -10185,6 +11818,7 @@ This document compiles all anti-patterns identified across the frontend standard
 ## TypeScript Anti-Patterns
 
 **❌ NEVER:**
+
 - Use `any` without explicit justification comment
 - Use `@ts-ignore` or `@ts-expect-error` without explaining why
 - Skip type definitions for exported functions
@@ -10193,12 +11827,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Use `I` prefix for interfaces (e.g., `IProduct`)
 - Use `interface` for component props (use `type` instead)
 
-
 ---
 
 ## Component Anti-Patterns
 
 **❌ NEVER:**
+
 - Create God components (> 300 lines, > 10 props)
 - Skip ref forwarding on interactive elements
 - Skip className exposure (prevents customization)
@@ -10208,12 +11842,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Use default exports in library components (use named exports)
 - Mix casing (Button.tsx vs button.module.scss)
 
-
 ---
 
 ## Performance Anti-Patterns
 
 **❌ NEVER:**
+
 - Memoize everything (premature optimization has overhead)
 - Skip memoization for expensive operations
 - Use inline function definitions in JSX props (causes re-renders)
@@ -10225,12 +11859,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Not measure performance before optimizing
 - Set bundle size budgets (sizes grow unnoticed)
 
-
 ---
 
 ## Testing Anti-Patterns
 
 **❌ NEVER:**
+
 - Test implementation details (test behavior, not implementation)
 - Use brittle selectors (prefer `getByRole`, `getByLabelText`)
 - Skip MSW setup for API tests
@@ -10240,12 +11874,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Mock too much (integration tests should use real dependencies)
 - Skip accessibility testing
 
-
 ---
 
 ## API & Data Fetching Anti-Patterns
 
 **❌ NEVER:**
+
 - Hardcode API URLs (use environment variables)
 - Skip error handling for API calls
 - Skip loading states
@@ -10255,12 +11889,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Not handle race conditions
 - Skip request deduplication
 
-
 ---
 
 ## Styling Anti-Patterns
 
 **❌ NEVER:**
+
 - Use CSS-in-JS (styled-components, Emotion) - use SCSS Modules
 - Use inline styles for anything other than dynamic values
 - Hardcode colors/spacing (use design tokens)
@@ -10269,12 +11903,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Skip Ladle stories for design system components
 - Use Tailwind classes directly in components (use design tokens)
 
-
 ---
 
 ## Accessibility Anti-Patterns
 
 **❌ NEVER:**
+
 - Remove focus outlines without replacement
 - Use `div` or `span` for buttons/links
 - Add click handlers on non-interactive elements without role/keyboard support
@@ -10286,12 +11920,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Create form inputs without labels
 - Skip keyboard navigation support
 
-
 ---
 
 ## Build & Tooling Anti-Patterns
 
 **❌ NEVER:**
+
 - Skip linting configuration
 - Use multiple icon libraries (use lucide-react)
 - Import entire lucide-react package
@@ -10301,12 +11935,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Skip pre-commit hooks
 - Not use Turborepo caching (wastes build time)
 
-
 ---
 
 ## Environment & Security Anti-Patterns
 
 **❌ NEVER:**
+
 - Commit secrets to repository
 - Use `process.env.VARIABLE` directly without validation
 - Hardcode environment values in code
@@ -10319,12 +11953,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Expose secrets in client-side code (must use framework prefixes)
 - Use `dangerouslySetInnerHTML` with user input
 
-
 ---
 
 ## File & Directory Anti-Patterns
 
 **❌ NEVER:**
+
 - Use PascalCase for file names (use kebab-case)
 - Mix casing (Button.tsx and button.module.scss)
 - Use default exports in libraries
@@ -10332,12 +11966,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Import from internal paths instead of package exports
 - Use relative imports for cross-package imports
 
-
 ---
 
 ## Monorepo Anti-Patterns
 
 **❌ NEVER:**
+
 - Have version mismatches across packages (use syncpack)
 - Skip dependency synchronization
 - Not declare environment variables in turbo.json
@@ -10346,7 +11980,6 @@ This document compiles all anti-patterns identified across the frontend standard
 - Not use remote caching (wastes CI time)
 - Not use affected builds
 
-
 ---
 
 ## Quick Anti-Pattern Checklist
@@ -10354,6 +11987,7 @@ This document compiles all anti-patterns identified across the frontend standard
 Review this checklist before submitting code:
 
 **Code Quality:**
+
 - [ ] No `any` without justification
 - [ ] No magic numbers
 - [ ] No hardcoded values
@@ -10361,6 +11995,7 @@ Review this checklist before submitting code:
 - [ ] kebab-case file names
 
 **Components:**
+
 - [ ] Ref forwarding on interactive elements
 - [ ] className prop exposed
 - [ ] No God components (< 300 lines)
@@ -10368,30 +12003,35 @@ Review this checklist before submitting code:
 - [ ] Design tokens (no hardcoded colors/spacing)
 
 **State & Data:**
+
 - [ ] Server data in React Query
 - [ ] UI state in Zustand
 - [ ] Separate selectors (or `shallow` when destructuring)
 - [ ] No prop drilling for global state
 
 **Performance:**
+
 - [ ] Lazy load routes
 - [ ] No unnecessary memoization
 - [ ] Optimized images
 - [ ] No large libraries imported whole
 
 **Testing:**
+
 - [ ] MSW for API mocking
 - [ ] Testing Library queries (getByRole)
 - [ ] Integration tests
 - [ ] Accessibility tests
 
 **Security:**
+
 - [ ] No committed secrets
 - [ ] Validated environment variables
 - [ ] No exposed API keys
 - [ ] Input sanitization
 
 **Accessibility:**
+
 - [ ] Semantic HTML
 - [ ] Keyboard navigation
 - [ ] ARIA labels
@@ -11623,7 +13263,7 @@ When a task involves improving your own prompt/configuration:
 
 ### Process
 
-````xml
+```xml
 <self_improvement_workflow>
 1. **Read Current Configuration**
    - Load `.claude/agents/[your-name].md`
@@ -11679,7 +13319,7 @@ When a task involves improving your own prompt/configuration:
 
    **Expected Impact:**
    [How this should improve performance]
-````
+```
 
 5. **Suggest, Don't Apply**
    - Propose changes with clear rationale
@@ -11722,6 +13362,11 @@ All improvements must use established prompt engineering patterns:
 
 ❌ Bad: "Check the auth patterns"
 ✅ Good: "Examine UserStore.ts lines 45-89 for the async flow pattern"
+
+**Pattern 2: Concrete Examples**
+
+❌ Bad: "Use MobX properly"
+✅ Good: "Use `flow` from MobX for async actions (see UserStore.fetchUser())"
 
 **Pattern 3: Explicit Constraints**
 

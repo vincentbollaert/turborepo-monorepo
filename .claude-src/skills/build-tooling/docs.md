@@ -15,6 +15,7 @@
 **Pattern:** Define task dependencies and caching behavior
 
 **Key concepts:**
+
 - `dependsOn: ["^build"]` - Run dependency tasks first (topological order)
 - `outputs` - Define what files to cache
 - `inputs` - Specify which files trigger cache invalidation
@@ -51,16 +52,19 @@
 ### Caching Strategies
 
 **What gets cached:**
+
 - Build outputs (`dist/`, `.next/`)
 - Test results (when `cache: true`)
 - Lint results
 
 **What doesn't get cached:**
+
 - Dev servers (`cache: false`)
 - Code generation (`cache: false` - generates files)
 - Tasks with side effects
 
 **Cache invalidation triggers:**
+
 - Source file changes
 - Dependency changes
 - Environment variable changes (when in `env` array)
@@ -96,8 +100,6 @@
 
 **Why:** Turbo includes env vars in cache key - different values trigger rebuilds
 
-> See examples.md Turborepo Configuration section for complete examples
-
 ---
 
 ## Linting Configuration
@@ -111,6 +113,7 @@
 **Pattern:** Shared base config extended by apps and packages
 
 **Structure:**
+
 ```
 packages/eslint-config/
 ├── base.js           # Base config for all packages
@@ -124,17 +127,20 @@ packages/eslint-config/
 ### Key Features
 
 **ESLint 9 flat config:**
+
 - New configuration format (replaces `.eslintrc`)
 - Simpler, more flexible
 - Better TypeScript support
 
 **Plugins used:**
+
 - `@typescript-eslint` - TypeScript linting
 - `eslint-config-prettier` - Disable conflicting Prettier rules
 - `eslint-plugin-turbo` - Validate environment variables
 - `eslint-plugin-only-warn` - Convert errors to warnings (better DX)
 
 **Why `only-warn`:**
+
 - Developers aren't blocked by errors
 - Issues are visible but not disruptive
 - CI can still fail on warnings if needed
@@ -142,11 +148,13 @@ packages/eslint-config/
 ### ESLint vs Biome (2025)
 
 **Current choice: ESLint 9**
+
 - Mature ecosystem
 - Extensive plugin support
 - Good TypeScript integration
 
 **Biome (emerging alternative):**
+
 - ✅ Extremely fast (Rust-based)
 - ✅ Combined linter + formatter
 - ✅ Drop-in Prettier replacement
@@ -154,11 +162,10 @@ packages/eslint-config/
 - ❌ Fewer plugins
 
 **Recommendation:**
+
 - Stick with ESLint for now (mature, stable)
 - Monitor Biome adoption (may switch in 2025-2026)
 - Consider Biome for greenfield projects
-
-> See examples.md Linting Configuration section for configuration examples
 
 ---
 
@@ -185,26 +192,31 @@ packages/eslint-config/
 ### Format Settings Explained
 
 **Line width:** `100` characters
+
 - Balances readability and screen width
 - Works well with side-by-side diffs
 - Alternative: `120` for wider screens
 
 **Quotes:** Double quotes (`"`)
+
 - Consistent with JSON
 - Fewer escapes in JSX
 - Alternative: Single quotes (`'`) for smaller bundles
 
 **Semicolons:** Required
+
 - Explicit statement termination
 - Avoids ASI issues
 - Alternative: No semicolons (modern style)
 
 **Trailing commas:** All
+
 - Cleaner git diffs
 - Easier to reorder items
 - Required for multi-line
 
 **Arrow parens:** Always
+
 - Consistent with multi-param functions
 - Easier to add params later
 
@@ -246,22 +258,23 @@ indent_size = 2
 ### Prettier vs Biome
 
 **Current choice: Prettier**
+
 - Industry standard
 - Extensive language support
 - Battle-tested
 
 **Biome alternative:**
+
 - ~20x faster than Prettier
 - Combined linter + formatter
 - Compatible with Prettier config
 - Growing adoption
 
 **When to switch:**
+
 - Large monorepos (speed matters)
 - Greenfield projects
 - When Biome plugin ecosystem matures
-
-> See examples.md Formatting section for configuration examples
 
 ---
 
@@ -292,6 +305,7 @@ cd apps/client-react && bun run test --watch=false
 **Pattern:** Per-package configuration runs ESLint with auto-fix on staged TypeScript and SCSS files.
 
 **What runs on commit:**
+
 - ESLint with auto-fix
 - Prettier formatting (via ESLint integration)
 - Only on staged files (fast!)
@@ -299,11 +313,13 @@ cd apps/client-react && bun run test --watch=false
 ### What to Run Pre-commit
 
 **Recommended (fast):**
+
 - ✅ Linting with auto-fix
 - ✅ Formatting
 - ✅ Type checking (--noEmit, fast)
 
 **NOT recommended (slow):**
+
 - ❌ Full test suite (run in pre-push or CI)
 - ❌ Full build (too slow)
 - ❌ E2E tests (run in CI)
@@ -316,13 +332,8 @@ cd apps/client-react && bun run test --watch=false
 // lint-staged.config.mjs
 export default {
   "*.{ts,tsx}": (filenames) => {
-    const testFiles = filenames
-      .filter(f => f.includes('.test.'))
-      .map(f => `bun test ${f}`)
-    return [
-      "eslint --fix",
-      ...testFiles,
-    ];
+    const testFiles = filenames.filter((f) => f.includes(".test.")).map((f) => `bun test ${f}`);
+    return ["eslint --fix", ...testFiles];
   },
 };
 ```
@@ -331,14 +342,9 @@ export default {
 
 ```javascript
 export default {
-  "*.{ts,tsx}": [
-    "eslint --fix",
-    () => "tsc --noEmit --incremental",
-  ],
+  "*.{ts,tsx}": ["eslint --fix", () => "tsc --noEmit --incremental"],
 };
 ```
-
-> See examples.md Pre-commit Hooks section for examples
 
 ---
 
@@ -351,6 +357,7 @@ export default {
 ### Shared Config Pattern
 
 **Structure:**
+
 ```
 packages/typescript-config/
 ├── base.json              # Common settings for all packages
@@ -412,11 +419,10 @@ packages/typescript-config/
 ```
 
 **Benefits:**
+
 - Clean imports: `import { Button } from "@components/button"`
 - No relative path hell: No `../../../components`
 - Easy refactoring
-
-> See core patterns code-conventions Import/Export Patterns section for import patterns
 
 ---
 
@@ -435,6 +441,7 @@ packages/typescript-config/
 ### Why Bun?
 
 **Benefits:**
+
 - ⚡ Extremely fast installs (3-10x faster than npm/yarn)
 - 🔧 Native TypeScript support
 - 🎯 Compatible with npm packages
@@ -442,6 +449,7 @@ packages/typescript-config/
 - 🔨 Built-in bundler
 
 **Alternatives:**
+
 - **npm** - Slowest, but universal
 - **yarn** - Faster, PnP mode
 - **pnpm** - Efficient disk usage, fast
@@ -458,6 +466,7 @@ packages/typescript-config/
 ```
 
 **Benefits:**
+
 - Shared dependencies across packages
 - Hoist common dependencies
 - Link local packages automatically
@@ -484,11 +493,13 @@ packages/typescript-config/
 ### Why Syncpack?
 
 **Problem:**
+
 - Different packages use different versions of React
 - `@types/react` version mismatch
 - Duplicate dependencies in bundle
 
 **Solution:**
+
 - Syncpack identifies version mismatches
 - Auto-fix to use consistent versions
 - Reduces bundle size
@@ -514,6 +525,7 @@ $ bun run deps:fix
 ### Bundle Analysis
 
 **Tools:**
+
 - `rollup-plugin-visualizer` - Vite/Rollup
 - `@next/bundle-analyzer` - Next.js
 - `webpack-bundle-analyzer` - Webpack
@@ -528,6 +540,7 @@ bun run build --analyze
 ### Code Splitting
 
 **Patterns:**
+
 - Route-based splitting (automatic in Next.js)
 - Component lazy loading with `React.lazy()`
 - Vendor chunk splitting
@@ -536,6 +549,7 @@ bun run build --analyze
 ### Tree Shaking
 
 **Requirements:**
+
 - ES modules (not CommonJS)
 - Named exports (not default)
 - Side-effect-free code
@@ -576,8 +590,7 @@ Or specify files with side effects:
 ```
 
 **Monitor:**
+
 - Initial bundle < 200KB (gzip)
 - Largest chunk < 500KB
 - Total bundle < 1MB
-
-> See examples.md Build Optimization section for implementation examples

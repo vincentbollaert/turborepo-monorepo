@@ -231,8 +231,6 @@ All React code must follow established patterns and conventions:
   - Variants defined with `cva` **only when multiple variants exist**
   - Components are composable (not monolithic)
 
-> See examples.md Component Architecture section for code examples
-
 **When to use cva:**
 
 - ✅ Component has multiple variant options (size, variant, color, etc.)
@@ -409,8 +407,6 @@ export type ButtonProps = React.ComponentProps<"button"> &
   - Design tokens for UI values
 - Configuration objects over scattered constants
 
-> See examples.md Constants and Magic Numbers section for code examples
-
 **Common areas with magic numbers:**
 
 - Timeouts and intervals
@@ -434,8 +430,6 @@ export type ButtonProps = React.ComponentProps<"button"> &
 ## TypeScript Strictness
 
 **MANDATORY: Strict mode enabled in tsconfig.json**
-
-> See examples.md TypeScript Strictness section for required tsconfig.json settings
 
 **Enforcement:**
 
@@ -465,8 +459,6 @@ export type ButtonProps = React.ComponentProps<"button"> &
 - Error recovery strategies
 - Network error handling
 - Async error handling patterns
-
-> See examples.md Error Handling Patterns section for code examples
 
 ---
 
@@ -543,8 +535,6 @@ export type ButtonProps = React.ComponentProps<"button"> &
 }
 ```
 
-> See examples.md Component State Styling section for code examples
-
 **RED FLAGS:**
 
 - ❌ Using className toggling for state (e.g., `className={isExpanded ? 'expanded' : ''}`)
@@ -591,8 +581,6 @@ components/button/
 └── button.stories.tsx    # Required for design system!
 ```
 
-> See examples.md Component Documentation section for code examples
-
 **RED FLAGS:**
 
 - ❌ Design system components without story files
@@ -638,8 +626,6 @@ import { IconName } from "lucide-react";
 - ❌ Brand logos or custom graphics
 - ❌ Complex illustrations
 - ❌ Icons not available in lucide-react
-
-> See examples.md Icon Library section for code examples
 
 **RED FLAGS:**
 
@@ -1676,23 +1662,25 @@ import {
 Open Props provides battle-tested design tokens. Semantic tokens reference Open Props. Components never use Open Props directly.
 
 **Example:**
+
 ```scss
 // packages/ui/src/styles/variables.scss
 // ✅ CORRECT: Semantic tokens reference Open Props
---color-primary: var(--blue-2);      // From Open Props
---color-accent: var(--cyan-4);       // From Open Props
---shadow-md: var(--shadow-2);        // From Open Props
+--color-primary: var(--blue-2); // From Open Props
+--color-accent: var(--cyan-4); // From Open Props
+--shadow-md: var(--shadow-2); // From Open Props
 
 // ✅ Component usage (always use semantic tokens)
 .button {
-  color: var(--color-primary);       // NOT var(--blue-2)
-  box-shadow: var(--shadow-md);      // NOT var(--shadow-2)
+  color: var(--color-primary); // NOT var(--blue-2)
+  box-shadow: var(--shadow-md); // NOT var(--shadow-2)
 }
 ```
 
 **Commonly used:** Colors (`--gray-*`, `--blue-*`, `--cyan-4`), Shadows (`--shadow-1/2/3`), Spacing.
 
 **RED FLAGS:**
+
 - ❌ Using Open Props variables directly in components (bypasses semantic layer)
 - ❌ Mixing custom color scales with Open Props (creates inconsistency)
 - ❌ Not using semantic tokens (makes theme changes difficult)
@@ -1855,8 +1843,6 @@ import styles from "./button.module.scss";
 - Expose `className` prop for customization
 - Use `asChild` pattern for polymorphic components (design system components)
 
-> See code-conventions/docs.md Component Architecture section for detailed component patterns
-
 ---
 
 ## Component-Specific Variables
@@ -1932,7 +1918,7 @@ import styles from "./button.module.scss";
 
 ```scss
 .icon {
-  width: var(--text-size-icon);   // 16px
+  width: var(--text-size-icon); // 16px
   height: var(--text-size-icon);
 }
 ```
@@ -1943,7 +1929,7 @@ Icons automatically inherit color from their parent element's text color. Use se
 
 ```scss
 .button {
-  color: var(--color-text-default);  // Icon inherits this color
+  color: var(--color-text-default); // Icon inherits this color
 }
 ```
 
@@ -1956,8 +1942,6 @@ Icon-only buttons must have accessible labels:
   <ChevronDown />
 </Button>
 ```
-
-> See code-conventions/docs.md Icon Library section for implementation details and usage patterns
 
 
 ---
@@ -2588,8 +2572,6 @@ export const Socials = () => {
 - Allow users to skip navigation and jump to main content
 - Multiple skip links for complex layouts (skip to navigation, skip to sidebar, etc.)
 
-> See examples.md Keyboard Navigation Standards section for implementation
-
 ---
 
 ## ARIA Patterns
@@ -2599,28 +2581,33 @@ export const Socials = () => {
 ### Component-Specific ARIA
 
 **Buttons:**
+
 - `aria-label` - For icon-only buttons
 - `aria-pressed` - For toggle buttons
 - `aria-expanded` - For expandable sections
 - `aria-disabled` - Use with `disabled` attribute
 
 **Forms:**
+
 - `aria-required` - Required fields (use with `required`)
 - `aria-invalid` - Invalid fields
 - `aria-describedby` - Link to error messages, helper text
 - `aria-errormessage` - Explicit error message reference
 
 **Navigation:**
+
 - `aria-current="page"` - Current page in navigation
 - `aria-label` - Describe navigation purpose ("Main navigation", "Footer navigation")
 
 **Modals/Dialogs:**
+
 - `role="dialog"` or `role="alertdialog"`
 - `aria-modal="true"`
 - `aria-labelledby` - Points to dialog title
 - `aria-describedby` - Points to dialog description
 
 **Tables:**
+
 - `scope="col"` and `scope="row"` for headers
 - `<caption>` for table description
 - `aria-sort` for sortable columns
@@ -2636,6 +2623,7 @@ export const Socials = () => {
 - `role="alert"` - For error messages (implies `aria-live="assertive"`)
 
 **Best practices:**
+
 - Keep messages concise and meaningful
 - Clear old messages before new ones
 - Don't spam with rapid updates (debounce)
@@ -2645,19 +2633,30 @@ export const Socials = () => {
 **Use semantic HTML5 elements (implicit ARIA roles):**
 
 ```html
-<header>      <!-- role="banner" -->
-<nav>         <!-- role="navigation" -->
-<main>        <!-- role="main" -->
-<aside>       <!-- role="complementary" -->
-<footer>      <!-- role="contentinfo" -->
-<section>     <!-- role="region" with aria-label -->
+<header>
+  <!-- role="banner" -->
+  <nav>
+    <!-- role="navigation" -->
+    <main>
+      <!-- role="main" -->
+      <aside>
+        <!-- role="complementary" -->
+        <footer>
+          <!-- role="contentinfo" -->
+          <section><!-- role="region" with aria-label --></section>
+        </footer>
+      </aside>
+    </main>
+  </nav>
+</header>
 ```
 
 **Multiple landmarks of same type need labels:**
 
 ```html
 <nav aria-label="Main navigation">
-<nav aria-label="Footer navigation">
+  <nav aria-label="Footer navigation"></nav>
+</nav>
 ```
 
 ### Accessible Names
@@ -2670,11 +2669,10 @@ export const Socials = () => {
 4. `title` attribute (last resort, not well supported)
 
 **Rules:**
+
 - Icon-only buttons MUST have `aria-label`
 - Form inputs MUST have associated `<label>` or `aria-label`
 - Images MUST have descriptive `alt` text (empty `alt=""` for decorative images)
-
-> See examples.md ARIA Patterns section for implementation
 
 ---
 
@@ -2685,11 +2683,13 @@ export const Socials = () => {
 ### Contrast Ratios
 
 **Text contrast (AA):**
+
 - Normal text (< 18px): 4.5:1 minimum
 - Large text (≥ 18px or ≥ 14px bold): 3:1 minimum
 - AAA (recommended): 7:1 for normal, 4.5:1 for large
 
 **Non-text contrast:**
+
 - UI components (buttons, form inputs): 3:1 minimum
 - Focus indicators: 3:1 against background
 - Icons (functional): 3:1 minimum
@@ -2697,11 +2697,13 @@ export const Socials = () => {
 ### Testing Tools
 
 **Automated:**
+
 - **axe DevTools** (browser extension) - Free, comprehensive
 - **WAVE** (browser extension) - Free, visual feedback
 - **Lighthouse** (Chrome DevTools) - Built-in, automated audits
 
 **Manual:**
+
 - **WebAIM Contrast Checker** - Quick ratio checking
 - **Stark** (Figma/browser plugin) - Design-integrated testing
 - **ColorOracle** - Color blindness simulation
@@ -2714,8 +2716,6 @@ export const Socials = () => {
 - Use text labels with status colors
 - Provide patterns/textures in charts
 - Underline links in body text
-
-> See examples.md Color Contrast Requirements section for implementation
 
 ---
 
@@ -2735,6 +2735,7 @@ export const Socials = () => {
 - `<form>` with proper `<label>` associations
 
 **Never:**
+
 - ❌ Use `<div>` or `<span>` for interactive elements
 - ❌ Use click handlers on non-interactive elements without proper role
 - ❌ Use tables for layout
@@ -2791,8 +2792,6 @@ export const Socials = () => {
 - `type="date"` - Date picker
 - `type="search"` - Search keyboard
 
-> See examples.md Form Accessibility section for implementation
-
 ---
 
 ## Focus Indicators
@@ -2843,6 +2842,7 @@ export const Socials = () => {
 ### Minimum Sizes
 
 **Interactive elements:**
+
 - Buttons: 44×44px minimum
 - Links in text: Increase padding to meet 44×44px
 - Form inputs: 44px height minimum
@@ -2869,6 +2869,7 @@ export const Socials = () => {
 ### Spacing
 
 **Minimum spacing between targets:**
+
 - 8px minimum between adjacent touch targets
 - More spacing on mobile (12-16px recommended)
 
@@ -2901,8 +2902,10 @@ export const Socials = () => {
 **Decorative content:**
 
 ```html
-<img src="decorative.png" alt="" /> <!-- Empty alt for decorative images -->
-<Icon aria-hidden="true" /> <!-- Hide decorative icons -->
+<img src="decorative.png" alt="" />
+<!-- Empty alt for decorative images -->
+<Icon aria-hidden="true" />
+<!-- Hide decorative icons -->
 ```
 
 ---
@@ -2922,6 +2925,7 @@ const switch = within(feature).getByRole('switch');
 ```
 
 **Additional tools:**
+
 - **jest-axe** - Automated accessibility testing in unit tests
 - **axe-core** - Runtime accessibility testing
 - **eslint-plugin-jsx-a11y** - Lint-time accessibility checks
@@ -2929,6 +2933,7 @@ const switch = within(feature).getByRole('switch');
 ### Manual Testing Checklist
 
 **Keyboard navigation:**
+
 - [ ] Can reach all interactive elements via Tab
 - [ ] Focus indicators visible and clear
 - [ ] Can activate all buttons/links with Enter/Space
@@ -2936,6 +2941,7 @@ const switch = within(feature).getByRole('switch');
 - [ ] No keyboard traps
 
 **Screen reader:**
+
 - [ ] All images have alt text
 - [ ] Form inputs have labels
 - [ ] Error messages are announced
@@ -2943,6 +2949,7 @@ const switch = within(feature).getByRole('switch');
 - [ ] Live regions announce updates
 
 **Visual:**
+
 - [ ] Sufficient color contrast
 - [ ] Information not conveyed by color alone
 - [ ] Text can be resized to 200% without breaking layout
@@ -2951,6 +2958,7 @@ const switch = within(feature).getByRole('switch');
 ### Screen Reader Testing
 
 **Test with multiple screen readers:**
+
 - **NVDA** (Windows) - Free, most popular
 - **JAWS** (Windows) - Industry standard
 - **VoiceOver** (macOS/iOS) - Built-in
@@ -2959,12 +2967,11 @@ const switch = within(feature).getByRole('switch');
 ### Browser Testing
 
 **Test in multiple browsers:**
+
 - Chrome (most users)
 - Safari (macOS/iOS accessibility)
 - Firefox (strong accessibility support)
 - Edge (enterprise users)
-
-> See examples.md Testing Approach section for implementation
 
 ---
 
@@ -2988,15 +2995,18 @@ const switch = within(feature).getByRole('switch');
 ## Resources
 
 **Official guidelines:**
+
 - WCAG 2.1 Guidelines: https://www.w3.org/WAI/WCAG21/quickref/
 - WAI-ARIA Authoring Practices: https://www.w3.org/WAI/ARIA/apg/
 
 **Tools:**
+
 - axe DevTools: https://www.deque.com/axe/devtools/
 - WAVE: https://wave.webaim.org/
 - WebAIM Contrast Checker: https://webaim.org/resources/contrastchecker/
 
 **Testing:**
+
 - NVDA Screen Reader: https://www.nvaccess.org/
 - Keyboard Navigation Guide: https://webaim.org/articles/keyboard/
 
@@ -4205,12 +4215,14 @@ This document outlines **recommended best practices** for performance standards 
 **Target: > 80% cache hit rate**
 
 **Improve cache hits:**
+
 - Don't modify generated files manually
 - Use deterministic builds (no timestamps in output)
 - Declare all environment variables in `turbo.json`
 - Use granular tasks (separate lint/test/build)
 
 **Monitoring cache performance:**
+
 ```bash
 # View Turborepo cache stats
 turbo run build --summarize
@@ -4224,11 +4236,12 @@ turbo run build --summarize
 **ACTUAL: Turborepo executes tasks in parallel**
 
 Builds multiple packages simultaneously, respects dependency graph.
+
 ```json
 {
   "tasks": {
     "build": {
-      "dependsOn": ["^build"]  // Wait for dependencies
+      "dependsOn": ["^build"] // Wait for dependencies
     }
   }
 }
@@ -4239,6 +4252,7 @@ Builds multiple packages simultaneously, respects dependency graph.
 **Optimization strategies:**
 
 1. **Incremental compilation**
+
    ```json
    {
      "compilerOptions": {
@@ -4249,6 +4263,7 @@ Builds multiple packages simultaneously, respects dependency graph.
    ```
 
 2. **Project references** (for monorepos)
+
    - Compile only changed projects
    - Faster type checking
    - Better IDE performance
@@ -4257,12 +4272,10 @@ Builds multiple packages simultaneously, respects dependency graph.
    ```json
    {
      "compilerOptions": {
-       "skipLibCheck": true  // Don't type-check node_modules
+       "skipLibCheck": true // Don't type-check node_modules
      }
    }
    ```
-
-> See examples.md (Build Performance) for Turborepo cache configuration, TypeScript incremental compilation, and build monitoring
 
 ---
 
@@ -4282,6 +4295,7 @@ Builds multiple packages simultaneously, respects dependency graph.
 - **Total initial load**: < 500 KB (gzipped)
 
 **Why these limits:**
+
 - 200 KB ≈ 1 second download on 3G
 - Faster Time to Interactive (TTI)
 - Better mobile performance
@@ -4302,6 +4316,7 @@ Builds multiple packages simultaneously, respects dependency graph.
 **Tools:**
 
 **Next.js:**
+
 ```bash
 # Install bundle analyzer
 bun add -D @next/bundle-analyzer
@@ -4311,6 +4326,7 @@ ANALYZE=true bun run build
 ```
 
 **Vite:**
+
 ```bash
 # Built-in bundle analysis
 bun run build -- --mode analyze
@@ -4320,6 +4336,7 @@ bun add -D rollup-plugin-visualizer
 ```
 
 **What to look for:**
+
 - Largest dependencies (consider alternatives)
 - Duplicate packages (fix with syncpack)
 - Unused code (improve tree shaking)
@@ -4328,6 +4345,7 @@ bun add -D rollup-plugin-visualizer
 ### Code Splitting Strategies
 
 **1. Route-based splitting** (automatic in Next.js)
+
 ```typescript
 // Automatic code splitting per page
 pages/
@@ -4337,6 +4355,7 @@ pages/
 ```
 
 **2. Component lazy loading**
+
 ```typescript
 import { lazy, Suspense } from 'react';
 
@@ -4348,18 +4367,20 @@ const HeavyComponent = lazy(() => import('./HeavyComponent'));
 ```
 
 **3. Dynamic imports for large libraries**
+
 ```typescript
 // ❌ BAD: Import large library upfront
-import _ from 'lodash';
+import _ from "lodash";
 
 // ✅ GOOD: Dynamic import when needed
 const loadLodash = async () => {
-  const _ = await import('lodash');
+  const _ = await import("lodash");
   return _;
 };
 ```
 
 **4. Vendor chunk splitting**
+
 ```javascript
 // next.config.js or vite.config.js
 optimization: {
@@ -4378,11 +4399,13 @@ optimization: {
 ### Tree Shaking
 
 **Requirements:**
+
 - ES modules (not CommonJS)
 - Named exports (not default exports)
 - Side-effect-free code
 
 **Mark packages as side-effect-free:**
+
 ```json
 {
   "sideEffects": false
@@ -4390,6 +4413,7 @@ optimization: {
 ```
 
 **Or specify files with side effects:**
+
 ```json
 {
   "sideEffects": ["*.css", "*.scss", "*.global.js"]
@@ -4397,6 +4421,7 @@ optimization: {
 ```
 
 **Common tree shaking issues:**
+
 - CommonJS imports (`require()`) - not tree-shakeable
 - Barrel exports (`index.ts` re-exporting everything) - imports everything
 - Side effects in module scope - prevents tree shaking
@@ -4406,6 +4431,7 @@ optimization: {
 **MANDATORY: Set up basic bundle size checking**
 
 **Simplest approach - Add to package.json:**
+
 ```json
 {
   "scripts": {
@@ -4423,11 +4449,13 @@ optimization: {
 ```
 
 **Install bundlesize:**
+
 ```bash
 bun add -D bundlesize
 ```
 
 **Add to CI (GitHub Actions):**
+
 ```yaml
 # .github/workflows/ci.yml
 - name: Build
@@ -4438,6 +4466,7 @@ bun add -D bundlesize
 ```
 
 **For more advanced tracking, use size-limit:**
+
 ```bash
 bun add -D @size-limit/preset-app
 ```
@@ -4453,8 +4482,6 @@ bun add -D @size-limit/preset-app
 }
 ```
 
-> See examples.md (Bundle Size Budgets) for code splitting with React.lazy and Suspense
-
 ---
 
 ## Runtime Performance (Core Web Vitals)
@@ -4466,6 +4493,7 @@ bun add -D @size-limit/preset-app
 **Google's recommended thresholds:**
 
 1. **LCP (Largest Contentful Paint): < 2.5s**
+
    - Measures loading performance
    - When largest element becomes visible
    - **How to improve:**
@@ -4475,6 +4503,7 @@ bun add -D @size-limit/preset-app
      - Server-side rendering (SSR) or Static Site Generation (SSG)
 
 2. **FID (First Input Delay): < 100ms** → **INP (Interaction to Next Paint): < 200ms** (new metric)
+
    - Measures interactivity
    - Time from user interaction to browser response
    - **How to improve:**
@@ -4495,40 +4524,46 @@ bun add -D @size-limit/preset-app
 ### Additional Performance Metrics
 
 **4. FCP (First Contentful Paint): < 1.8s**
-   - When first content appears
-   - Improves perceived performance
+
+- When first content appears
+- Improves perceived performance
 
 **5. TTI (Time to Interactive): < 3.8s**
-   - When page becomes fully interactive
-   - Critical for mobile users
+
+- When page becomes fully interactive
+- Critical for mobile users
 
 **6. TBT (Total Blocking Time): < 300ms**
-   - Sum of blocking time between FCP and TTI
-   - Indicates main thread blocking
+
+- Sum of blocking time between FCP and TTI
+- Indicates main thread blocking
 
 ### Performance Monitoring
 
 **Tools:**
 
 **Development:**
+
 - Chrome DevTools Lighthouse
 - Chrome DevTools Performance tab
 - React DevTools Profiler
 
 **Production:**
+
 - **Web Vitals library** (measure Core Web Vitals)
 - **Google Analytics** (send Web Vitals data)
 - **Sentry Performance Monitoring**
 - **Vercel Analytics** (automatic for Vercel deployments)
 
 **Implementation:**
+
 ```typescript
-import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
+import { getCLS, getFID, getFCP, getLCP, getTTFB } from "web-vitals";
 
 function sendToAnalytics(metric: Metric) {
   // Send to your analytics endpoint
-  fetch('/analytics', {
-    method: 'POST',
+  fetch("/analytics", {
+    method: "POST",
     body: JSON.stringify(metric),
   });
 }
@@ -4556,6 +4591,7 @@ getTTFB(sendToAnalytics);
 ```
 
 **budget.json:**
+
 ```json
 [
   {
@@ -4588,8 +4624,6 @@ getTTFB(sendToAnalytics);
 ]
 ```
 
-> See examples.md (Runtime Performance) for web-vitals integration, Lighthouse CI setup, and CLS prevention
-
 ---
 
 ## React Performance Patterns
@@ -4599,16 +4633,19 @@ getTTFB(sendToAnalytics);
 ### When to Use React.memo
 
 **Use React.memo when:**
+
 - Component renders frequently with same props
 - Component is expensive to render
 - Component is deep in the tree
 
 **Don't use React.memo when:**
+
 - Props change frequently
 - Component is cheap to render
 - Premature optimization (profile first!)
 
 **Example:**
+
 ```typescript
 // ✅ GOOD: Memoize expensive component
 export const ExpensiveChart = React.memo(({ data }: Props) => {
@@ -4625,16 +4662,19 @@ export const SimpleButton = React.memo(({ label }: Props) => {
 ### When to Use useMemo
 
 **Use useMemo for:**
+
 - Expensive calculations (filtering, sorting large arrays)
 - Creating objects/arrays passed as props to memoized components
 - Preventing referential equality issues
 
 **Don't use useMemo for:**
+
 - Simple calculations (addition, string concatenation)
 - Values used only in JSX (not passed as props)
 - Premature optimization
 
 **Example:**
+
 ```typescript
 // ✅ GOOD: Memoize expensive calculation
 const sortedData = useMemo(() => {
@@ -4642,22 +4682,25 @@ const sortedData = useMemo(() => {
 }, [data]);
 
 // ❌ BAD: Memoizing simple calculation
-const doubled = useMemo(() => value * 2, [value]);  // Overhead > benefit
+const doubled = useMemo(() => value * 2, [value]); // Overhead > benefit
 ```
 
 ### When to Use useCallback
 
 **Use useCallback for:**
+
 - Functions passed to memoized child components
 - Functions used in dependency arrays
 - Event handlers in optimized components
 
 **Don't use useCallback for:**
+
 - Functions not passed to children
 - Functions that change on every render anyway
 - Inline event handlers in non-optimized components
 
 **Example:**
+
 ```typescript
 // ✅ GOOD: Callback passed to memoized child
 const handleClick = useCallback(() => {
@@ -4677,16 +4720,19 @@ return <input onChange={handleChange} />;
 ### Virtual Scrolling
 
 **Use virtual scrolling when:**
+
 - Rendering > 100 items
 - Items have consistent height
 - List is scrollable
 
 **Libraries:**
+
 - **react-window** - Lightweight, simple
 - **react-virtuoso** - Feature-rich, dynamic heights
 - **TanStack Virtual** - Headless, flexible
 
 **Benefits:**
+
 - Constant DOM size (only renders visible items)
 - Smooth scrolling with 100K+ items
 - Dramatically reduced memory usage
@@ -4718,6 +4764,7 @@ function App() {
 ```
 
 **Benefits:**
+
 - Smaller initial bundle
 - Faster Time to Interactive
 - Load code when needed
@@ -4725,21 +4772,22 @@ function App() {
 ### Debouncing and Throttling
 
 **Debouncing: Wait until user stops**
+
 - Search inputs
 - Form validation
 - Auto-save
 
 **Throttling: Limit execution rate**
+
 - Scroll handlers
 - Resize handlers
 - Mouse move tracking
 
 **Libraries:**
+
 - `use-debounce` (React hooks)
 - `lodash.debounce`
 - `lodash.throttle`
-
-> See examples.md (React Performance Patterns) for memoization, virtual scrolling, and debouncing examples
 
 ---
 
@@ -4750,6 +4798,7 @@ function App() {
 ### Real User Monitoring (RUM)
 
 **What to monitor:**
+
 - Core Web Vitals (LCP, FID/INP, CLS)
 - Page load times
 - API response times
@@ -4757,6 +4806,7 @@ function App() {
 - Render times
 
 **Tools:**
+
 - **Google Analytics 4** - Free, basic RUM
 - **Sentry Performance** - Error tracking + performance
 - **Vercel Analytics** - Automatic for Vercel
@@ -4778,6 +4828,7 @@ function App() {
 ```
 
 **Benefits:**
+
 - Catch performance regressions early
 - Prevent shipping slow code
 - Enforce standards
@@ -4785,11 +4836,13 @@ function App() {
 ### Metrics to Track
 
 **Build metrics:**
+
 - Build duration
 - Bundle sizes
 - Cache hit rate
 
 **Runtime metrics:**
+
 - Core Web Vitals (LCP, FID/INP, CLS)
 - Time to First Byte (TTFB)
 - API response times
@@ -4797,12 +4850,11 @@ function App() {
 - Memory usage
 
 **User experience metrics:**
+
 - Page views
 - Bounce rate
 - Session duration
 - Conversion rate (impacted by performance)
-
-> See examples.md (Performance Monitoring) for real user monitoring setup, bundle size monitoring in CI, and React DevTools profiling
 
 ---
 
@@ -4815,10 +4867,12 @@ function App() {
 **Format selection:**
 
 1. **AVIF** - Best compression (30-50% smaller than JPEG)
+
    - Limited browser support (93% as of 2024)
    - Use with fallbacks
 
 2. **WebP** - Good compression (25-35% smaller than JPEG)
+
    - Excellent browser support (97%)
    - Recommended default
 
@@ -4827,6 +4881,7 @@ function App() {
    - Use for compatibility
 
 **Implementation:**
+
 ```html
 <picture>
   <source srcset="/image.avif" type="image/avif" />
@@ -4838,30 +4893,30 @@ function App() {
 ### Lazy Loading
 
 **Native lazy loading:**
+
 ```html
 <img src="/image.jpg" alt="Description" loading="lazy" />
 ```
 
 **When to use:**
+
 - Below-the-fold images
 - Images in long pages
 - Carousels and galleries
 
 **When NOT to use:**
+
 - Above-the-fold images (use `loading="eager"` or omit)
 - Images needed for initial render
 
 ### Responsive Images
 
 **Use srcset for different screen sizes:**
+
 ```html
 <img
   src="/image-800.jpg"
-  srcset="
-    /image-400.jpg 400w,
-    /image-800.jpg 800w,
-    /image-1200.jpg 1200w
-  "
+  srcset="/image-400.jpg 400w, /image-800.jpg 800w, /image-1200.jpg 1200w"
   sizes="(max-width: 600px) 400px, (max-width: 1200px) 800px, 1200px"
   alt="Responsive image"
 />
@@ -4870,6 +4925,7 @@ function App() {
 ### Next.js Image Component
 
 **Automatic optimization:**
+
 ```typescript
 import Image from 'next/image';
 
@@ -4885,12 +4941,11 @@ import Image from 'next/image';
 ```
 
 **Benefits:**
+
 - Automatic format selection (AVIF/WebP)
 - Lazy loading by default
 - Prevents layout shift (width/height required)
 - Blur placeholder for better UX
-
-> See examples.md (Image Optimization) for modern image formats with fallbacks, Next.js Image component, and optimization scripts
 
 ---
 
@@ -4914,6 +4969,7 @@ import Image from 'next/image';
 ## Performance Checklist
 
 **Build performance:**
+
 - [ ] Turborepo caching enabled (> 80% hit rate)
 - [ ] TypeScript incremental compilation
 - [ ] Bundle size budgets defined and enforced
@@ -4921,6 +4977,7 @@ import Image from 'next/image';
 - [ ] Tree shaking configured correctly
 
 **Runtime performance:**
+
 - [ ] Core Web Vitals monitored (LCP < 2.5s, FID < 100ms, CLS < 0.1)
 - [ ] Images optimized (WebP/AVIF, lazy loading, responsive)
 - [ ] Code splitting implemented (route-based + dynamic imports)
@@ -4928,12 +4985,14 @@ import Image from 'next/image';
 - [ ] JavaScript execution optimized (debouncing, web workers)
 
 **React performance:**
+
 - [ ] Virtual scrolling for long lists (> 100 items)
 - [ ] Lazy loading for route components
 - [ ] Memoization used strategically (not everywhere)
 - [ ] Profiling done before optimization
 
 **Monitoring:**
+
 - [ ] Real User Monitoring (RUM) in production
 - [ ] Performance budgets in CI
 - [ ] Lighthouse CI running on PRs
@@ -4944,16 +5003,19 @@ import Image from 'next/image';
 ## Resources
 
 **Official documentation:**
+
 - Core Web Vitals: https://web.dev/vitals/
 - Lighthouse: https://developers.google.com/web/tools/lighthouse
 - React Performance: https://react.dev/learn/render-and-commit
 
 **Tools:**
+
 - web-vitals library: https://github.com/GoogleChrome/web-vitals
 - Lighthouse CI: https://github.com/GoogleChrome/lighthouse-ci
 - Bundle Analyzer: https://www.npmjs.com/package/@next/bundle-analyzer
 
 **Performance guides:**
+
 - Web.dev: https://web.dev/fast/
 - Patterns.dev: https://www.patterns.dev/posts/performance-patterns/
 
@@ -5657,19 +5719,20 @@ done
 **RULE: Use local state ONLY when state is truly component-local. As soon as state is needed in multiple places, use global state management.**
 
 **Local State (React.useState):**
+
 - ✅ Component-local UI state (isExpanded, isOpen, selectedIndex)
 - ✅ State used ONLY within a single component
 - ✅ Temporary UI state that doesn't need to be shared
 - ✅ Form input values (if form is self-contained)
 
 **Global State (Zustand/Context):**
+
 - ✅ State needed by multiple components across the tree
 - ✅ Modal open/closed state (accessed from multiple places)
 - ✅ Sidebar collapsed state (header + sidebar need it)
 - ✅ User preferences (theme, language, layout settings)
 - ✅ Shopping cart, filters, selections shared across routes
 - ✅ Any state that needs to be accessed from 2+ disconnected components
-
 
 **Decision tree when you need to share state:**
 
@@ -5689,8 +5752,6 @@ done
 - ❌ Syncing server data manually to client state
 - ❌ Using useState for state needed in multiple components (lift to Zustand instead)
 - ❌ Prop drilling 3+ levels (use Zustand instead)
-
-> See examples.md Server State vs Client State section for good vs bad examples
 
 ---
 
@@ -5734,8 +5795,6 @@ const queryClient = new QueryClient({
 - Use `Info` component for error and empty states
 - Never leave states unhandled
 
-> See examples.md React Query Patterns section for complete examples
-
 **RED FLAGS:**
 
 - ❌ Writing custom useQuery hooks (use generated options)
@@ -5756,11 +5815,13 @@ const queryClient = new QueryClient({
 **Use ONLY when state is truly component-local**
 
 **When to use useState:**
+
 - ✅ State used ONLY in one component (isExpanded, isOpen)
 - ✅ Temporary UI state that never needs to be shared
 - ✅ Form input values (if form is self-contained)
 
 **When NOT to use useState:**
+
 - ❌ State needed in 2+ components (use Zustand)
 - ❌ Prop drilling 3+ levels (use Zustand)
 - ❌ Server data (use React Query)
@@ -5785,6 +5846,7 @@ export const Feature = ({ id, title, status, description }: FeatureProps) => {
 **Use as soon as state is needed in multiple places**
 
 **When to use Zustand:**
+
 - ✅ State needed by 2+ components across the tree
 - ✅ Modal state (trigger from header, render in layout)
 - ✅ Sidebar collapsed (header button + sidebar component)
@@ -5824,26 +5886,26 @@ function Sidebar() {
 ```
 
 **Zustand Patterns:**
+
 - **Prefer separate selectors** for best performance (each component selects only what it needs)
 - Use `shallow` only when destructuring multiple values into an object
 - Keep stores focused (ui-store, cart-store, not app-store)
 - Use middleware: `persist` for localStorage, `devtools` for debugging
 
 **Selector approaches:**
+
 ```typescript
 // ✅ BEST: Separate selectors (no shallow needed)
 const sidebarOpen = useUIStore((state) => state.sidebarOpen);
 const theme = useUIStore((state) => state.theme);
 
 // ✅ GOOD: Shallow when destructuring multiple values
-import { shallow } from 'zustand/shallow';
+import { shallow } from "zustand/shallow";
 const { sidebarOpen, theme } = useUIStore(
   (state) => ({ sidebarOpen: state.sidebarOpen, theme: state.theme }),
-  shallow
+  shallow,
 );
 ```
-
-> See examples.md Client State Management section for complete examples
 
 **RED FLAGS:**
 
@@ -5859,12 +5921,14 @@ const { sidebarOpen, theme } = useUIStore(
 **CRITICAL: Context is NOT a state management solution. It's for dependency injection and singletons ONLY.**
 
 **ONLY use Context for:**
+
 - ✅ Framework providers (QueryClientProvider, Router, etc.)
 - ✅ Dependency injection (services, API clients, DB connections)
 - ✅ Singletons that NEVER or RARELY change (theme configuration, i18n)
 - ✅ Values that are set once at app initialization
 
 **NEVER use Context for:**
+
 - ❌ **ANY state management** (use Zustand instead)
 - ❌ **ANY frequently updating values** (massive performance issues)
 - ❌ Server data (use React Query)
@@ -5923,8 +5987,6 @@ const useUIStore = create((set) => ({
 - ❌ Context for shopping cart, filters, selections
 - ❌ "Splitting contexts" to fix performance (just use Zustand!)
 
-> See examples.md Context API section for examples
-
 ---
 
 ## URL State for Shareable Filters
@@ -5944,11 +6006,9 @@ const useUIStore = create((set) => ({
 ```typescript
 // Next.js App Router
 const searchParams = useSearchParams();
-const category = searchParams.get('category');
-const search = searchParams.get('search');
+const category = searchParams.get("category");
+const search = searchParams.get("search");
 ```
-
-> See examples.md URL State section for complete examples
 
 **RED FLAGS:**
 
@@ -6572,6 +6632,7 @@ This document compiles all anti-patterns identified across the frontend standard
 ## State Management Anti-Patterns
 
 **❌ NEVER:**
+
 - Store server data in Zustand (use React Query instead)
 - Store client UI state in React Query (use Zustand instead)
 - Create unnecessary object references in Zustand selectors (causes re-renders)
@@ -6584,6 +6645,7 @@ This document compiles all anti-patterns identified across the frontend standard
 ## TypeScript Anti-Patterns
 
 **❌ NEVER:**
+
 - Use `any` without explicit justification comment
 - Use `@ts-ignore` or `@ts-expect-error` without explaining why
 - Skip type definitions for exported functions
@@ -6592,12 +6654,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Use `I` prefix for interfaces (e.g., `IProduct`)
 - Use `interface` for component props (use `type` instead)
 
-
 ---
 
 ## Component Anti-Patterns
 
 **❌ NEVER:**
+
 - Create God components (> 300 lines, > 10 props)
 - Skip ref forwarding on interactive elements
 - Skip className exposure (prevents customization)
@@ -6607,12 +6669,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Use default exports in library components (use named exports)
 - Mix casing (Button.tsx vs button.module.scss)
 
-
 ---
 
 ## Performance Anti-Patterns
 
 **❌ NEVER:**
+
 - Memoize everything (premature optimization has overhead)
 - Skip memoization for expensive operations
 - Use inline function definitions in JSX props (causes re-renders)
@@ -6624,12 +6686,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Not measure performance before optimizing
 - Set bundle size budgets (sizes grow unnoticed)
 
-
 ---
 
 ## Testing Anti-Patterns
 
 **❌ NEVER:**
+
 - Test implementation details (test behavior, not implementation)
 - Use brittle selectors (prefer `getByRole`, `getByLabelText`)
 - Skip MSW setup for API tests
@@ -6639,12 +6701,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Mock too much (integration tests should use real dependencies)
 - Skip accessibility testing
 
-
 ---
 
 ## API & Data Fetching Anti-Patterns
 
 **❌ NEVER:**
+
 - Hardcode API URLs (use environment variables)
 - Skip error handling for API calls
 - Skip loading states
@@ -6654,12 +6716,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Not handle race conditions
 - Skip request deduplication
 
-
 ---
 
 ## Styling Anti-Patterns
 
 **❌ NEVER:**
+
 - Use CSS-in-JS (styled-components, Emotion) - use SCSS Modules
 - Use inline styles for anything other than dynamic values
 - Hardcode colors/spacing (use design tokens)
@@ -6668,12 +6730,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Skip Ladle stories for design system components
 - Use Tailwind classes directly in components (use design tokens)
 
-
 ---
 
 ## Accessibility Anti-Patterns
 
 **❌ NEVER:**
+
 - Remove focus outlines without replacement
 - Use `div` or `span` for buttons/links
 - Add click handlers on non-interactive elements without role/keyboard support
@@ -6685,12 +6747,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Create form inputs without labels
 - Skip keyboard navigation support
 
-
 ---
 
 ## Build & Tooling Anti-Patterns
 
 **❌ NEVER:**
+
 - Skip linting configuration
 - Use multiple icon libraries (use lucide-react)
 - Import entire lucide-react package
@@ -6700,12 +6762,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Skip pre-commit hooks
 - Not use Turborepo caching (wastes build time)
 
-
 ---
 
 ## Environment & Security Anti-Patterns
 
 **❌ NEVER:**
+
 - Commit secrets to repository
 - Use `process.env.VARIABLE` directly without validation
 - Hardcode environment values in code
@@ -6718,12 +6780,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Expose secrets in client-side code (must use framework prefixes)
 - Use `dangerouslySetInnerHTML` with user input
 
-
 ---
 
 ## File & Directory Anti-Patterns
 
 **❌ NEVER:**
+
 - Use PascalCase for file names (use kebab-case)
 - Mix casing (Button.tsx and button.module.scss)
 - Use default exports in libraries
@@ -6731,12 +6793,12 @@ This document compiles all anti-patterns identified across the frontend standard
 - Import from internal paths instead of package exports
 - Use relative imports for cross-package imports
 
-
 ---
 
 ## Monorepo Anti-Patterns
 
 **❌ NEVER:**
+
 - Have version mismatches across packages (use syncpack)
 - Skip dependency synchronization
 - Not declare environment variables in turbo.json
@@ -6745,7 +6807,6 @@ This document compiles all anti-patterns identified across the frontend standard
 - Not use remote caching (wastes CI time)
 - Not use affected builds
 
-
 ---
 
 ## Quick Anti-Pattern Checklist
@@ -6753,6 +6814,7 @@ This document compiles all anti-patterns identified across the frontend standard
 Review this checklist before submitting code:
 
 **Code Quality:**
+
 - [ ] No `any` without justification
 - [ ] No magic numbers
 - [ ] No hardcoded values
@@ -6760,6 +6822,7 @@ Review this checklist before submitting code:
 - [ ] kebab-case file names
 
 **Components:**
+
 - [ ] Ref forwarding on interactive elements
 - [ ] className prop exposed
 - [ ] No God components (< 300 lines)
@@ -6767,30 +6830,35 @@ Review this checklist before submitting code:
 - [ ] Design tokens (no hardcoded colors/spacing)
 
 **State & Data:**
+
 - [ ] Server data in React Query
 - [ ] UI state in Zustand
 - [ ] Separate selectors (or `shallow` when destructuring)
 - [ ] No prop drilling for global state
 
 **Performance:**
+
 - [ ] Lazy load routes
 - [ ] No unnecessary memoization
 - [ ] Optimized images
 - [ ] No large libraries imported whole
 
 **Testing:**
+
 - [ ] MSW for API mocking
 - [ ] Testing Library queries (getByRole)
 - [ ] Integration tests
 - [ ] Accessibility tests
 
 **Security:**
+
 - [ ] No committed secrets
 - [ ] Validated environment variables
 - [ ] No exposed API keys
 - [ ] Input sanitization
 
 **Accessibility:**
+
 - [ ] Semantic HTML
 - [ ] Keyboard navigation
 - [ ] ARIA labels
@@ -7791,8 +7859,6 @@ React Testing Library + MSW useful for component behavior when E2E too slow. Don
 - Test files: `*.spec.ts` or `*.e2e.ts`
 - Group by user journey, not by component
 
-> See examples.md E2E Testing section for Playwright examples
-
 **RED FLAGS:**
 
 - ❌ No E2E tests for critical user flows
@@ -7846,8 +7912,6 @@ describe("calculateTotal", () => {
   });
 });
 ```
-
-> See examples.md Unit Testing section for more examples
 
 **RED FLAGS:**
 
@@ -7935,8 +7999,6 @@ test('displays incremented count', () => {
 - MSW for API mocking at network level
 - Centralized mock data in `@repo/api-mocks`
 - Test all states: loading, empty, error, success
-
-> See examples.md Integration Testing section for current codebase examples
 
 **Migration Path:**
 
@@ -8081,8 +8143,6 @@ packages/api-mocks/src/
 - Mocks can drift from real API
 - Need to maintain mock data
 - Doesn't catch real API issues
-
-> See examples.md Mock Data Patterns section for current patterns
 
 **Future: Replace with E2E tests against real APIs in test environment**
 
@@ -8911,51 +8971,53 @@ it("should handle empty state", async () => {
 ## Output Format
 
 <output_format>
-<specialist_analysis>
-**Domain:** [Your specialty - React, Security, etc.]
+<summary>
+**Overall Assessment:** [Approve / Request Changes / Major Revisions Needed]
 
-**Scope Reviewed:**
+**Key Findings:** [2-3 sentence summary]
+</summary>
 
-- [Specific aspect 1]
-- [Specific aspect 2]
+<must_fix>
+🔴 **Critical Issues** (must be addressed before approval)
 
-**Out of Scope:** [What you didn't review - other specialists' domains]
-</specialist_analysis>
+1. **[Issue Title]**
+   - Location: [File:line or general area]
+   - Problem: [What's wrong]
+   - Why it matters: [Impact/risk]
+   - Suggestion: [How to fix while following existing patterns]
 
-<domain_specific_implementation>
-**[Relevant Code Section]**
+[Repeat for each critical issue]
+</must_fix>
 
-```typescript
-[Your specialized code]
-```
+<suggestions>
+🟡 **Improvements** (nice-to-have, not blockers)
 
-**Pattern Justification:**
-This follows the established [domain] pattern from [specific file:lines].
-Specifically: [How it matches the pattern]
-</domain_specific_implementation>
+1. **[Improvement Title]**
+   - Could be better: [What could improve]
+   - Benefit: [Why this would help]
+   - Suggestion: [Optional approach]
 
-<integration_notes>
-**For Other Agents:**
+[Repeat for each suggestion]
+</suggestions>
 
-- [Instructions for how other parts of the system should use this]
-- [Any dependencies or requirements]
-- [Integration points to be aware of]
-  </integration_notes>
+<positive_feedback>
+✅ **What Was Done Well**
 
-<domain_review>
-**Strengths:**
+- [Specific thing done well and why it's good]
+- [Another thing done well]
+- [Reinforces good patterns]
+</positive_feedback>
 
-- [What's good from domain perspective]
+<convention_check>
+**Codebase Convention Adherence:**
+- Naming: ✅ / ⚠️ / ❌
+- File structure: ✅ / ⚠️ / ❌
+- Pattern consistency: ✅ / ⚠️ / ❌
+- Utility usage: ✅ / ⚠️ / ❌
 
-**Concerns:**
-
-- [Any domain-specific issues]
-
-**Recommendations:**
-
-- [Domain-specific suggestions]
-  </domain_review>
-  </output_format>
+[Explain any ⚠️ or ❌ marks]
+</convention_check>
+</output_format>
 
 
 ---
@@ -8979,7 +9041,7 @@ When a task involves improving your own prompt/configuration:
 
 ### Process
 
-````xml
+```xml
 <self_improvement_workflow>
 1. **Read Current Configuration**
    - Load `.claude/agents/[your-name].md`
@@ -9035,7 +9097,7 @@ When a task involves improving your own prompt/configuration:
 
    **Expected Impact:**
    [How this should improve performance]
-````
+```
 
 5. **Suggest, Don't Apply**
    - Propose changes with clear rationale
@@ -9078,6 +9140,11 @@ All improvements must use established prompt engineering patterns:
 
 ❌ Bad: "Check the auth patterns"
 ✅ Good: "Examine UserStore.ts lines 45-89 for the async flow pattern"
+
+**Pattern 2: Concrete Examples**
+
+❌ Bad: "Use MobX properly"
+✅ Good: "Use `flow` from MobX for async actions (see UserStore.fetchUser())"
 
 **Pattern 3: Explicit Constraints**
 

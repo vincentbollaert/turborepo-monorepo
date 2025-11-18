@@ -21,19 +21,20 @@
 **RULE: Use local state ONLY when state is truly component-local. As soon as state is needed in multiple places, use global state management.**
 
 **Local State (React.useState):**
+
 - ✅ Component-local UI state (isExpanded, isOpen, selectedIndex)
 - ✅ State used ONLY within a single component
 - ✅ Temporary UI state that doesn't need to be shared
 - ✅ Form input values (if form is self-contained)
 
 **Global State (Zustand/Context):**
+
 - ✅ State needed by multiple components across the tree
 - ✅ Modal open/closed state (accessed from multiple places)
 - ✅ Sidebar collapsed state (header + sidebar need it)
 - ✅ User preferences (theme, language, layout settings)
 - ✅ Shopping cart, filters, selections shared across routes
 - ✅ Any state that needs to be accessed from 2+ disconnected components
-
 
 **Decision tree when you need to share state:**
 
@@ -53,8 +54,6 @@
 - ❌ Syncing server data manually to client state
 - ❌ Using useState for state needed in multiple components (lift to Zustand instead)
 - ❌ Prop drilling 3+ levels (use Zustand instead)
-
-> See examples.md Server State vs Client State section for good vs bad examples
 
 ---
 
@@ -98,8 +97,6 @@ const queryClient = new QueryClient({
 - Use `Info` component for error and empty states
 - Never leave states unhandled
 
-> See examples.md React Query Patterns section for complete examples
-
 **RED FLAGS:**
 
 - ❌ Writing custom useQuery hooks (use generated options)
@@ -120,11 +117,13 @@ const queryClient = new QueryClient({
 **Use ONLY when state is truly component-local**
 
 **When to use useState:**
+
 - ✅ State used ONLY in one component (isExpanded, isOpen)
 - ✅ Temporary UI state that never needs to be shared
 - ✅ Form input values (if form is self-contained)
 
 **When NOT to use useState:**
+
 - ❌ State needed in 2+ components (use Zustand)
 - ❌ Prop drilling 3+ levels (use Zustand)
 - ❌ Server data (use React Query)
@@ -149,6 +148,7 @@ export const Feature = ({ id, title, status, description }: FeatureProps) => {
 **Use as soon as state is needed in multiple places**
 
 **When to use Zustand:**
+
 - ✅ State needed by 2+ components across the tree
 - ✅ Modal state (trigger from header, render in layout)
 - ✅ Sidebar collapsed (header button + sidebar component)
@@ -188,26 +188,26 @@ function Sidebar() {
 ```
 
 **Zustand Patterns:**
+
 - **Prefer separate selectors** for best performance (each component selects only what it needs)
 - Use `shallow` only when destructuring multiple values into an object
 - Keep stores focused (ui-store, cart-store, not app-store)
 - Use middleware: `persist` for localStorage, `devtools` for debugging
 
 **Selector approaches:**
+
 ```typescript
 // ✅ BEST: Separate selectors (no shallow needed)
 const sidebarOpen = useUIStore((state) => state.sidebarOpen);
 const theme = useUIStore((state) => state.theme);
 
 // ✅ GOOD: Shallow when destructuring multiple values
-import { shallow } from 'zustand/shallow';
+import { shallow } from "zustand/shallow";
 const { sidebarOpen, theme } = useUIStore(
   (state) => ({ sidebarOpen: state.sidebarOpen, theme: state.theme }),
-  shallow
+  shallow,
 );
 ```
-
-> See examples.md Client State Management section for complete examples
 
 **RED FLAGS:**
 
@@ -223,12 +223,14 @@ const { sidebarOpen, theme } = useUIStore(
 **CRITICAL: Context is NOT a state management solution. It's for dependency injection and singletons ONLY.**
 
 **ONLY use Context for:**
+
 - ✅ Framework providers (QueryClientProvider, Router, etc.)
 - ✅ Dependency injection (services, API clients, DB connections)
 - ✅ Singletons that NEVER or RARELY change (theme configuration, i18n)
 - ✅ Values that are set once at app initialization
 
 **NEVER use Context for:**
+
 - ❌ **ANY state management** (use Zustand instead)
 - ❌ **ANY frequently updating values** (massive performance issues)
 - ❌ Server data (use React Query)
@@ -287,8 +289,6 @@ const useUIStore = create((set) => ({
 - ❌ Context for shopping cart, filters, selections
 - ❌ "Splitting contexts" to fix performance (just use Zustand!)
 
-> See examples.md Context API section for examples
-
 ---
 
 ## URL State for Shareable Filters
@@ -308,11 +308,9 @@ const useUIStore = create((set) => ({
 ```typescript
 // Next.js App Router
 const searchParams = useSearchParams();
-const category = searchParams.get('category');
-const search = searchParams.get('search');
+const category = searchParams.get("category");
+const search = searchParams.get("search");
 ```
-
-> See examples.md URL State section for complete examples
 
 **RED FLAGS:**
 

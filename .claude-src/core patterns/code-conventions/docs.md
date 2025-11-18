@@ -21,8 +21,6 @@
   - Variants defined with `cva` **only when multiple variants exist**
   - Components are composable (not monolithic)
 
-> See examples.md Component Architecture section for code examples
-
 **When to use cva:**
 
 - ✅ Component has multiple variant options (size, variant, color, etc.)
@@ -199,8 +197,6 @@ export type ButtonProps = React.ComponentProps<"button"> &
   - Design tokens for UI values
 - Configuration objects over scattered constants
 
-> See examples.md Constants and Magic Numbers section for code examples
-
 **Common areas with magic numbers:**
 
 - Timeouts and intervals
@@ -224,8 +220,6 @@ export type ButtonProps = React.ComponentProps<"button"> &
 ## TypeScript Strictness
 
 **MANDATORY: Strict mode enabled in tsconfig.json**
-
-> See examples.md TypeScript Strictness section for required tsconfig.json settings
 
 **Enforcement:**
 
@@ -255,8 +249,6 @@ export type ButtonProps = React.ComponentProps<"button"> &
 - Error recovery strategies
 - Network error handling
 - Async error handling patterns
-
-> See examples.md Error Handling Patterns section for code examples
 
 ---
 
@@ -333,8 +325,6 @@ export type ButtonProps = React.ComponentProps<"button"> &
 }
 ```
 
-> See examples.md Component State Styling section for code examples
-
 **RED FLAGS:**
 
 - ❌ Using className toggling for state (e.g., `className={isExpanded ? 'expanded' : ''}`)
@@ -381,8 +371,6 @@ components/button/
 └── button.stories.tsx    # Required for design system!
 ```
 
-> See examples.md Component Documentation section for code examples
-
 **RED FLAGS:**
 
 - ❌ Design system components without story files
@@ -428,8 +416,6 @@ import { IconName } from "lucide-react";
 - ❌ Brand logos or custom graphics
 - ❌ Complex illustrations
 - ❌ Icons not available in lucide-react
-
-> See examples.md Icon Library section for code examples
 
 **RED FLAGS:**
 

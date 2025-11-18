@@ -26,12 +26,14 @@ This document outlines **recommended best practices** for performance standards 
 **Target: > 80% cache hit rate**
 
 **Improve cache hits:**
+
 - Don't modify generated files manually
 - Use deterministic builds (no timestamps in output)
 - Declare all environment variables in `turbo.json`
 - Use granular tasks (separate lint/test/build)
 
 **Monitoring cache performance:**
+
 ```bash
 # View Turborepo cache stats
 turbo run build --summarize
@@ -45,11 +47,12 @@ turbo run build --summarize
 **ACTUAL: Turborepo executes tasks in parallel**
 
 Builds multiple packages simultaneously, respects dependency graph.
+
 ```json
 {
   "tasks": {
     "build": {
-      "dependsOn": ["^build"]  // Wait for dependencies
+      "dependsOn": ["^build"] // Wait for dependencies
     }
   }
 }
@@ -60,6 +63,7 @@ Builds multiple packages simultaneously, respects dependency graph.
 **Optimization strategies:**
 
 1. **Incremental compilation**
+
    ```json
    {
      "compilerOptions": {
@@ -70,6 +74,7 @@ Builds multiple packages simultaneously, respects dependency graph.
    ```
 
 2. **Project references** (for monorepos)
+
    - Compile only changed projects
    - Faster type checking
    - Better IDE performance
@@ -78,12 +83,10 @@ Builds multiple packages simultaneously, respects dependency graph.
    ```json
    {
      "compilerOptions": {
-       "skipLibCheck": true  // Don't type-check node_modules
+       "skipLibCheck": true // Don't type-check node_modules
      }
    }
    ```
-
-> See examples.md (Build Performance) for Turborepo cache configuration, TypeScript incremental compilation, and build monitoring
 
 ---
 
@@ -103,6 +106,7 @@ Builds multiple packages simultaneously, respects dependency graph.
 - **Total initial load**: < 500 KB (gzipped)
 
 **Why these limits:**
+
 - 200 KB ≈ 1 second download on 3G
 - Faster Time to Interactive (TTI)
 - Better mobile performance
@@ -123,6 +127,7 @@ Builds multiple packages simultaneously, respects dependency graph.
 **Tools:**
 
 **Next.js:**
+
 ```bash
 # Install bundle analyzer
 bun add -D @next/bundle-analyzer
@@ -132,6 +137,7 @@ ANALYZE=true bun run build
 ```
 
 **Vite:**
+
 ```bash
 # Built-in bundle analysis
 bun run build -- --mode analyze
@@ -141,6 +147,7 @@ bun add -D rollup-plugin-visualizer
 ```
 
 **What to look for:**
+
 - Largest dependencies (consider alternatives)
 - Duplicate packages (fix with syncpack)
 - Unused code (improve tree shaking)
@@ -149,6 +156,7 @@ bun add -D rollup-plugin-visualizer
 ### Code Splitting Strategies
 
 **1. Route-based splitting** (automatic in Next.js)
+
 ```typescript
 // Automatic code splitting per page
 pages/
@@ -158,6 +166,7 @@ pages/
 ```
 
 **2. Component lazy loading**
+
 ```typescript
 import { lazy, Suspense } from 'react';
 
@@ -169,18 +178,20 @@ const HeavyComponent = lazy(() => import('./HeavyComponent'));
 ```
 
 **3. Dynamic imports for large libraries**
+
 ```typescript
 // ❌ BAD: Import large library upfront
-import _ from 'lodash';
+import _ from "lodash";
 
 // ✅ GOOD: Dynamic import when needed
 const loadLodash = async () => {
-  const _ = await import('lodash');
+  const _ = await import("lodash");
   return _;
 };
 ```
 
 **4. Vendor chunk splitting**
+
 ```javascript
 // next.config.js or vite.config.js
 optimization: {
@@ -199,11 +210,13 @@ optimization: {
 ### Tree Shaking
 
 **Requirements:**
+
 - ES modules (not CommonJS)
 - Named exports (not default exports)
 - Side-effect-free code
 
 **Mark packages as side-effect-free:**
+
 ```json
 {
   "sideEffects": false
@@ -211,6 +224,7 @@ optimization: {
 ```
 
 **Or specify files with side effects:**
+
 ```json
 {
   "sideEffects": ["*.css", "*.scss", "*.global.js"]
@@ -218,6 +232,7 @@ optimization: {
 ```
 
 **Common tree shaking issues:**
+
 - CommonJS imports (`require()`) - not tree-shakeable
 - Barrel exports (`index.ts` re-exporting everything) - imports everything
 - Side effects in module scope - prevents tree shaking
@@ -227,6 +242,7 @@ optimization: {
 **MANDATORY: Set up basic bundle size checking**
 
 **Simplest approach - Add to package.json:**
+
 ```json
 {
   "scripts": {
@@ -244,11 +260,13 @@ optimization: {
 ```
 
 **Install bundlesize:**
+
 ```bash
 bun add -D bundlesize
 ```
 
 **Add to CI (GitHub Actions):**
+
 ```yaml
 # .github/workflows/ci.yml
 - name: Build
@@ -259,6 +277,7 @@ bun add -D bundlesize
 ```
 
 **For more advanced tracking, use size-limit:**
+
 ```bash
 bun add -D @size-limit/preset-app
 ```
@@ -274,8 +293,6 @@ bun add -D @size-limit/preset-app
 }
 ```
 
-> See examples.md (Bundle Size Budgets) for code splitting with React.lazy and Suspense
-
 ---
 
 ## Runtime Performance (Core Web Vitals)
@@ -287,6 +304,7 @@ bun add -D @size-limit/preset-app
 **Google's recommended thresholds:**
 
 1. **LCP (Largest Contentful Paint): < 2.5s**
+
    - Measures loading performance
    - When largest element becomes visible
    - **How to improve:**
@@ -296,6 +314,7 @@ bun add -D @size-limit/preset-app
      - Server-side rendering (SSR) or Static Site Generation (SSG)
 
 2. **FID (First Input Delay): < 100ms** → **INP (Interaction to Next Paint): < 200ms** (new metric)
+
    - Measures interactivity
    - Time from user interaction to browser response
    - **How to improve:**
@@ -316,40 +335,46 @@ bun add -D @size-limit/preset-app
 ### Additional Performance Metrics
 
 **4. FCP (First Contentful Paint): < 1.8s**
-   - When first content appears
-   - Improves perceived performance
+
+- When first content appears
+- Improves perceived performance
 
 **5. TTI (Time to Interactive): < 3.8s**
-   - When page becomes fully interactive
-   - Critical for mobile users
+
+- When page becomes fully interactive
+- Critical for mobile users
 
 **6. TBT (Total Blocking Time): < 300ms**
-   - Sum of blocking time between FCP and TTI
-   - Indicates main thread blocking
+
+- Sum of blocking time between FCP and TTI
+- Indicates main thread blocking
 
 ### Performance Monitoring
 
 **Tools:**
 
 **Development:**
+
 - Chrome DevTools Lighthouse
 - Chrome DevTools Performance tab
 - React DevTools Profiler
 
 **Production:**
+
 - **Web Vitals library** (measure Core Web Vitals)
 - **Google Analytics** (send Web Vitals data)
 - **Sentry Performance Monitoring**
 - **Vercel Analytics** (automatic for Vercel deployments)
 
 **Implementation:**
+
 ```typescript
-import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
+import { getCLS, getFID, getFCP, getLCP, getTTFB } from "web-vitals";
 
 function sendToAnalytics(metric: Metric) {
   // Send to your analytics endpoint
-  fetch('/analytics', {
-    method: 'POST',
+  fetch("/analytics", {
+    method: "POST",
     body: JSON.stringify(metric),
   });
 }
@@ -377,6 +402,7 @@ getTTFB(sendToAnalytics);
 ```
 
 **budget.json:**
+
 ```json
 [
   {
@@ -409,8 +435,6 @@ getTTFB(sendToAnalytics);
 ]
 ```
 
-> See examples.md (Runtime Performance) for web-vitals integration, Lighthouse CI setup, and CLS prevention
-
 ---
 
 ## React Performance Patterns
@@ -420,16 +444,19 @@ getTTFB(sendToAnalytics);
 ### When to Use React.memo
 
 **Use React.memo when:**
+
 - Component renders frequently with same props
 - Component is expensive to render
 - Component is deep in the tree
 
 **Don't use React.memo when:**
+
 - Props change frequently
 - Component is cheap to render
 - Premature optimization (profile first!)
 
 **Example:**
+
 ```typescript
 // ✅ GOOD: Memoize expensive component
 export const ExpensiveChart = React.memo(({ data }: Props) => {
@@ -446,16 +473,19 @@ export const SimpleButton = React.memo(({ label }: Props) => {
 ### When to Use useMemo
 
 **Use useMemo for:**
+
 - Expensive calculations (filtering, sorting large arrays)
 - Creating objects/arrays passed as props to memoized components
 - Preventing referential equality issues
 
 **Don't use useMemo for:**
+
 - Simple calculations (addition, string concatenation)
 - Values used only in JSX (not passed as props)
 - Premature optimization
 
 **Example:**
+
 ```typescript
 // ✅ GOOD: Memoize expensive calculation
 const sortedData = useMemo(() => {
@@ -463,22 +493,25 @@ const sortedData = useMemo(() => {
 }, [data]);
 
 // ❌ BAD: Memoizing simple calculation
-const doubled = useMemo(() => value * 2, [value]);  // Overhead > benefit
+const doubled = useMemo(() => value * 2, [value]); // Overhead > benefit
 ```
 
 ### When to Use useCallback
 
 **Use useCallback for:**
+
 - Functions passed to memoized child components
 - Functions used in dependency arrays
 - Event handlers in optimized components
 
 **Don't use useCallback for:**
+
 - Functions not passed to children
 - Functions that change on every render anyway
 - Inline event handlers in non-optimized components
 
 **Example:**
+
 ```typescript
 // ✅ GOOD: Callback passed to memoized child
 const handleClick = useCallback(() => {
@@ -498,16 +531,19 @@ return <input onChange={handleChange} />;
 ### Virtual Scrolling
 
 **Use virtual scrolling when:**
+
 - Rendering > 100 items
 - Items have consistent height
 - List is scrollable
 
 **Libraries:**
+
 - **react-window** - Lightweight, simple
 - **react-virtuoso** - Feature-rich, dynamic heights
 - **TanStack Virtual** - Headless, flexible
 
 **Benefits:**
+
 - Constant DOM size (only renders visible items)
 - Smooth scrolling with 100K+ items
 - Dramatically reduced memory usage
@@ -539,6 +575,7 @@ function App() {
 ```
 
 **Benefits:**
+
 - Smaller initial bundle
 - Faster Time to Interactive
 - Load code when needed
@@ -546,21 +583,22 @@ function App() {
 ### Debouncing and Throttling
 
 **Debouncing: Wait until user stops**
+
 - Search inputs
 - Form validation
 - Auto-save
 
 **Throttling: Limit execution rate**
+
 - Scroll handlers
 - Resize handlers
 - Mouse move tracking
 
 **Libraries:**
+
 - `use-debounce` (React hooks)
 - `lodash.debounce`
 - `lodash.throttle`
-
-> See examples.md (React Performance Patterns) for memoization, virtual scrolling, and debouncing examples
 
 ---
 
@@ -571,6 +609,7 @@ function App() {
 ### Real User Monitoring (RUM)
 
 **What to monitor:**
+
 - Core Web Vitals (LCP, FID/INP, CLS)
 - Page load times
 - API response times
@@ -578,6 +617,7 @@ function App() {
 - Render times
 
 **Tools:**
+
 - **Google Analytics 4** - Free, basic RUM
 - **Sentry Performance** - Error tracking + performance
 - **Vercel Analytics** - Automatic for Vercel
@@ -599,6 +639,7 @@ function App() {
 ```
 
 **Benefits:**
+
 - Catch performance regressions early
 - Prevent shipping slow code
 - Enforce standards
@@ -606,11 +647,13 @@ function App() {
 ### Metrics to Track
 
 **Build metrics:**
+
 - Build duration
 - Bundle sizes
 - Cache hit rate
 
 **Runtime metrics:**
+
 - Core Web Vitals (LCP, FID/INP, CLS)
 - Time to First Byte (TTFB)
 - API response times
@@ -618,12 +661,11 @@ function App() {
 - Memory usage
 
 **User experience metrics:**
+
 - Page views
 - Bounce rate
 - Session duration
 - Conversion rate (impacted by performance)
-
-> See examples.md (Performance Monitoring) for real user monitoring setup, bundle size monitoring in CI, and React DevTools profiling
 
 ---
 
@@ -636,10 +678,12 @@ function App() {
 **Format selection:**
 
 1. **AVIF** - Best compression (30-50% smaller than JPEG)
+
    - Limited browser support (93% as of 2024)
    - Use with fallbacks
 
 2. **WebP** - Good compression (25-35% smaller than JPEG)
+
    - Excellent browser support (97%)
    - Recommended default
 
@@ -648,6 +692,7 @@ function App() {
    - Use for compatibility
 
 **Implementation:**
+
 ```html
 <picture>
   <source srcset="/image.avif" type="image/avif" />
@@ -659,30 +704,30 @@ function App() {
 ### Lazy Loading
 
 **Native lazy loading:**
+
 ```html
 <img src="/image.jpg" alt="Description" loading="lazy" />
 ```
 
 **When to use:**
+
 - Below-the-fold images
 - Images in long pages
 - Carousels and galleries
 
 **When NOT to use:**
+
 - Above-the-fold images (use `loading="eager"` or omit)
 - Images needed for initial render
 
 ### Responsive Images
 
 **Use srcset for different screen sizes:**
+
 ```html
 <img
   src="/image-800.jpg"
-  srcset="
-    /image-400.jpg 400w,
-    /image-800.jpg 800w,
-    /image-1200.jpg 1200w
-  "
+  srcset="/image-400.jpg 400w, /image-800.jpg 800w, /image-1200.jpg 1200w"
   sizes="(max-width: 600px) 400px, (max-width: 1200px) 800px, 1200px"
   alt="Responsive image"
 />
@@ -691,6 +736,7 @@ function App() {
 ### Next.js Image Component
 
 **Automatic optimization:**
+
 ```typescript
 import Image from 'next/image';
 
@@ -706,12 +752,11 @@ import Image from 'next/image';
 ```
 
 **Benefits:**
+
 - Automatic format selection (AVIF/WebP)
 - Lazy loading by default
 - Prevents layout shift (width/height required)
 - Blur placeholder for better UX
-
-> See examples.md (Image Optimization) for modern image formats with fallbacks, Next.js Image component, and optimization scripts
 
 ---
 
@@ -735,6 +780,7 @@ import Image from 'next/image';
 ## Performance Checklist
 
 **Build performance:**
+
 - [ ] Turborepo caching enabled (> 80% hit rate)
 - [ ] TypeScript incremental compilation
 - [ ] Bundle size budgets defined and enforced
@@ -742,6 +788,7 @@ import Image from 'next/image';
 - [ ] Tree shaking configured correctly
 
 **Runtime performance:**
+
 - [ ] Core Web Vitals monitored (LCP < 2.5s, FID < 100ms, CLS < 0.1)
 - [ ] Images optimized (WebP/AVIF, lazy loading, responsive)
 - [ ] Code splitting implemented (route-based + dynamic imports)
@@ -749,12 +796,14 @@ import Image from 'next/image';
 - [ ] JavaScript execution optimized (debouncing, web workers)
 
 **React performance:**
+
 - [ ] Virtual scrolling for long lists (> 100 items)
 - [ ] Lazy loading for route components
 - [ ] Memoization used strategically (not everywhere)
 - [ ] Profiling done before optimization
 
 **Monitoring:**
+
 - [ ] Real User Monitoring (RUM) in production
 - [ ] Performance budgets in CI
 - [ ] Lighthouse CI running on PRs
@@ -765,15 +814,18 @@ import Image from 'next/image';
 ## Resources
 
 **Official documentation:**
+
 - Core Web Vitals: https://web.dev/vitals/
 - Lighthouse: https://developers.google.com/web/tools/lighthouse
 - React Performance: https://react.dev/learn/render-and-commit
 
 **Tools:**
+
 - web-vitals library: https://github.com/GoogleChrome/web-vitals
 - Lighthouse CI: https://github.com/GoogleChrome/lighthouse-ci
 - Bundle Analyzer: https://www.npmjs.com/package/@next/bundle-analyzer
 
 **Performance guides:**
+
 - Web.dev: https://web.dev/fast/
 - Patterns.dev: https://www.patterns.dev/posts/performance-patterns/

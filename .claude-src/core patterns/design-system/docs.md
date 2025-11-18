@@ -28,23 +28,25 @@
 Open Props provides battle-tested design tokens. Semantic tokens reference Open Props. Components never use Open Props directly.
 
 **Example:**
+
 ```scss
 // packages/ui/src/styles/variables.scss
 // ✅ CORRECT: Semantic tokens reference Open Props
---color-primary: var(--blue-2);      // From Open Props
---color-accent: var(--cyan-4);       // From Open Props
---shadow-md: var(--shadow-2);        // From Open Props
+--color-primary: var(--blue-2); // From Open Props
+--color-accent: var(--cyan-4); // From Open Props
+--shadow-md: var(--shadow-2); // From Open Props
 
 // ✅ Component usage (always use semantic tokens)
 .button {
-  color: var(--color-primary);       // NOT var(--blue-2)
-  box-shadow: var(--shadow-md);      // NOT var(--shadow-2)
+  color: var(--color-primary); // NOT var(--blue-2)
+  box-shadow: var(--shadow-md); // NOT var(--shadow-2)
 }
 ```
 
 **Commonly used:** Colors (`--gray-*`, `--blue-*`, `--cyan-4`), Shadows (`--shadow-1/2/3`), Spacing.
 
 **RED FLAGS:**
+
 - ❌ Using Open Props variables directly in components (bypasses semantic layer)
 - ❌ Mixing custom color scales with Open Props (creates inconsistency)
 - ❌ Not using semantic tokens (makes theme changes difficult)
@@ -207,8 +209,6 @@ import styles from "./button.module.scss";
 - Expose `className` prop for customization
 - Use `asChild` pattern for polymorphic components (design system components)
 
-> See code-conventions/docs.md Component Architecture section for detailed component patterns
-
 ---
 
 ## Component-Specific Variables
@@ -284,7 +284,7 @@ import styles from "./button.module.scss";
 
 ```scss
 .icon {
-  width: var(--text-size-icon);   // 16px
+  width: var(--text-size-icon); // 16px
   height: var(--text-size-icon);
 }
 ```
@@ -295,7 +295,7 @@ Icons automatically inherit color from their parent element's text color. Use se
 
 ```scss
 .button {
-  color: var(--color-text-default);  // Icon inherits this color
+  color: var(--color-text-default); // Icon inherits this color
 }
 ```
 
@@ -308,5 +308,3 @@ Icon-only buttons must have accessible labels:
   <ChevronDown />
 </Button>
 ```
-
-> See code-conventions/docs.md Icon Library section for implementation details and usage patterns

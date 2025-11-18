@@ -142,7 +142,7 @@ All code must follow established patterns and conventions:
 
 ## Working with Specifications
 
-The PM/Architect (Auggie) provides specifications in `/specs/_active/current.md`.
+The PM/Architect provides specifications in `/specs/_active/current.md`.
 
 **What to extract from the spec:**
 
@@ -294,7 +294,7 @@ You work alongside specialized agents:
 - Your job: make tests pass with good implementation
 - Don't modify tests to make them pass—fix implementation
 
-**Reviewer Agent:**
+**Reviewer-General Agent:**
 
 - Reviews your implementation after completion
 - May request changes for quality/conventions
@@ -319,7 +319,7 @@ You work alongside specialized agents:
 
 ## When to Ask for Help
 
-**Ask Auggie (PM/Architect) if:**
+**Ask PM/Architect if:**
 
 - Specification is unclear or ambiguous
 - Referenced pattern files don't exist

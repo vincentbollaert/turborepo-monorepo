@@ -46,8 +46,6 @@
 - Allow users to skip navigation and jump to main content
 - Multiple skip links for complex layouts (skip to navigation, skip to sidebar, etc.)
 
-> See examples.md Keyboard Navigation Standards section for implementation
-
 ---
 
 ## ARIA Patterns
@@ -57,28 +55,33 @@
 ### Component-Specific ARIA
 
 **Buttons:**
+
 - `aria-label` - For icon-only buttons
 - `aria-pressed` - For toggle buttons
 - `aria-expanded` - For expandable sections
 - `aria-disabled` - Use with `disabled` attribute
 
 **Forms:**
+
 - `aria-required` - Required fields (use with `required`)
 - `aria-invalid` - Invalid fields
 - `aria-describedby` - Link to error messages, helper text
 - `aria-errormessage` - Explicit error message reference
 
 **Navigation:**
+
 - `aria-current="page"` - Current page in navigation
 - `aria-label` - Describe navigation purpose ("Main navigation", "Footer navigation")
 
 **Modals/Dialogs:**
+
 - `role="dialog"` or `role="alertdialog"`
 - `aria-modal="true"`
 - `aria-labelledby` - Points to dialog title
 - `aria-describedby` - Points to dialog description
 
 **Tables:**
+
 - `scope="col"` and `scope="row"` for headers
 - `<caption>` for table description
 - `aria-sort` for sortable columns
@@ -94,6 +97,7 @@
 - `role="alert"` - For error messages (implies `aria-live="assertive"`)
 
 **Best practices:**
+
 - Keep messages concise and meaningful
 - Clear old messages before new ones
 - Don't spam with rapid updates (debounce)
@@ -103,19 +107,30 @@
 **Use semantic HTML5 elements (implicit ARIA roles):**
 
 ```html
-<header>      <!-- role="banner" -->
-<nav>         <!-- role="navigation" -->
-<main>        <!-- role="main" -->
-<aside>       <!-- role="complementary" -->
-<footer>      <!-- role="contentinfo" -->
-<section>     <!-- role="region" with aria-label -->
+<header>
+  <!-- role="banner" -->
+  <nav>
+    <!-- role="navigation" -->
+    <main>
+      <!-- role="main" -->
+      <aside>
+        <!-- role="complementary" -->
+        <footer>
+          <!-- role="contentinfo" -->
+          <section><!-- role="region" with aria-label --></section>
+        </footer>
+      </aside>
+    </main>
+  </nav>
+</header>
 ```
 
 **Multiple landmarks of same type need labels:**
 
 ```html
 <nav aria-label="Main navigation">
-<nav aria-label="Footer navigation">
+  <nav aria-label="Footer navigation"></nav>
+</nav>
 ```
 
 ### Accessible Names
@@ -128,11 +143,10 @@
 4. `title` attribute (last resort, not well supported)
 
 **Rules:**
+
 - Icon-only buttons MUST have `aria-label`
 - Form inputs MUST have associated `<label>` or `aria-label`
 - Images MUST have descriptive `alt` text (empty `alt=""` for decorative images)
-
-> See examples.md ARIA Patterns section for implementation
 
 ---
 
@@ -143,11 +157,13 @@
 ### Contrast Ratios
 
 **Text contrast (AA):**
+
 - Normal text (< 18px): 4.5:1 minimum
 - Large text (≥ 18px or ≥ 14px bold): 3:1 minimum
 - AAA (recommended): 7:1 for normal, 4.5:1 for large
 
 **Non-text contrast:**
+
 - UI components (buttons, form inputs): 3:1 minimum
 - Focus indicators: 3:1 against background
 - Icons (functional): 3:1 minimum
@@ -155,11 +171,13 @@
 ### Testing Tools
 
 **Automated:**
+
 - **axe DevTools** (browser extension) - Free, comprehensive
 - **WAVE** (browser extension) - Free, visual feedback
 - **Lighthouse** (Chrome DevTools) - Built-in, automated audits
 
 **Manual:**
+
 - **WebAIM Contrast Checker** - Quick ratio checking
 - **Stark** (Figma/browser plugin) - Design-integrated testing
 - **ColorOracle** - Color blindness simulation
@@ -172,8 +190,6 @@
 - Use text labels with status colors
 - Provide patterns/textures in charts
 - Underline links in body text
-
-> See examples.md Color Contrast Requirements section for implementation
 
 ---
 
@@ -193,6 +209,7 @@
 - `<form>` with proper `<label>` associations
 
 **Never:**
+
 - ❌ Use `<div>` or `<span>` for interactive elements
 - ❌ Use click handlers on non-interactive elements without proper role
 - ❌ Use tables for layout
@@ -249,8 +266,6 @@
 - `type="date"` - Date picker
 - `type="search"` - Search keyboard
 
-> See examples.md Form Accessibility section for implementation
-
 ---
 
 ## Focus Indicators
@@ -301,6 +316,7 @@
 ### Minimum Sizes
 
 **Interactive elements:**
+
 - Buttons: 44×44px minimum
 - Links in text: Increase padding to meet 44×44px
 - Form inputs: 44px height minimum
@@ -327,6 +343,7 @@
 ### Spacing
 
 **Minimum spacing between targets:**
+
 - 8px minimum between adjacent touch targets
 - More spacing on mobile (12-16px recommended)
 
@@ -359,8 +376,10 @@
 **Decorative content:**
 
 ```html
-<img src="decorative.png" alt="" /> <!-- Empty alt for decorative images -->
-<Icon aria-hidden="true" /> <!-- Hide decorative icons -->
+<img src="decorative.png" alt="" />
+<!-- Empty alt for decorative images -->
+<Icon aria-hidden="true" />
+<!-- Hide decorative icons -->
 ```
 
 ---
@@ -380,6 +399,7 @@ const switch = within(feature).getByRole('switch');
 ```
 
 **Additional tools:**
+
 - **jest-axe** - Automated accessibility testing in unit tests
 - **axe-core** - Runtime accessibility testing
 - **eslint-plugin-jsx-a11y** - Lint-time accessibility checks
@@ -387,6 +407,7 @@ const switch = within(feature).getByRole('switch');
 ### Manual Testing Checklist
 
 **Keyboard navigation:**
+
 - [ ] Can reach all interactive elements via Tab
 - [ ] Focus indicators visible and clear
 - [ ] Can activate all buttons/links with Enter/Space
@@ -394,6 +415,7 @@ const switch = within(feature).getByRole('switch');
 - [ ] No keyboard traps
 
 **Screen reader:**
+
 - [ ] All images have alt text
 - [ ] Form inputs have labels
 - [ ] Error messages are announced
@@ -401,6 +423,7 @@ const switch = within(feature).getByRole('switch');
 - [ ] Live regions announce updates
 
 **Visual:**
+
 - [ ] Sufficient color contrast
 - [ ] Information not conveyed by color alone
 - [ ] Text can be resized to 200% without breaking layout
@@ -409,6 +432,7 @@ const switch = within(feature).getByRole('switch');
 ### Screen Reader Testing
 
 **Test with multiple screen readers:**
+
 - **NVDA** (Windows) - Free, most popular
 - **JAWS** (Windows) - Industry standard
 - **VoiceOver** (macOS/iOS) - Built-in
@@ -417,12 +441,11 @@ const switch = within(feature).getByRole('switch');
 ### Browser Testing
 
 **Test in multiple browsers:**
+
 - Chrome (most users)
 - Safari (macOS/iOS accessibility)
 - Firefox (strong accessibility support)
 - Edge (enterprise users)
-
-> See examples.md Testing Approach section for implementation
 
 ---
 
@@ -446,14 +469,17 @@ const switch = within(feature).getByRole('switch');
 ## Resources
 
 **Official guidelines:**
+
 - WCAG 2.1 Guidelines: https://www.w3.org/WAI/WCAG21/quickref/
 - WAI-ARIA Authoring Practices: https://www.w3.org/WAI/ARIA/apg/
 
 **Tools:**
+
 - axe DevTools: https://www.deque.com/axe/devtools/
 - WAVE: https://wave.webaim.org/
 - WebAIM Contrast Checker: https://webaim.org/resources/contrastchecker/
 
 **Testing:**
+
 - NVDA Screen Reader: https://www.nvaccess.org/
 - Keyboard Navigation Guide: https://webaim.org/articles/keyboard/
