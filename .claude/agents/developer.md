@@ -3554,13 +3554,1573 @@ Creating a new UI element?
 
 ---
 
-@include(../core patterns/quick-reference/src.md)
+# Quick Reference
+
+**Auto-detection:** Quick patterns, code templates, do's and don'ts, common snippets, fast feedback commands, decision trees, essential patterns
+
+**When to use:**
+
+- Need a quick reference for component patterns and templates
+- Looking for critical do's and don'ts across all domains
+- Want file-scoped commands for fast feedback loops
+- Need decision trees for common architectural questions
+- Seeking common code snippets (hooks, validation, mocking)
+- Quick lookups during active development
+
+**Key patterns covered:**
+
+- Essential code templates (components, hooks, stores, forms)
+- Critical do's and don'ts for all major areas (state, TypeScript, testing, security)
+- File-scoped commands for fast feedback (single file, package, affected)
+- Common code snippets (environment validation, MSW setup, custom hooks)
+- Decision trees for state management, styling, memoization, and testing
+- Quick checklists for commits and PRs
+
+---
+
+# Quick Reference for AI
+
+> **Quick Guide:** Essential patterns, critical do's and don'ts, and file-scoped commands for fast feedback. This is a condensed reference of all previous sections.
+
+---
+
+## Essential Code Patterns
+
+### Component Template (Recommended Structure)
+
+```typescript
+import { forwardRef } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import styles from './button.module.scss';
+
+// Variants using cva (only when multiple variants exist)
+const buttonVariants = cva(styles.button, {
+  variants: {
+    variant: {
+      primary: styles.primary,
+      secondary: styles.secondary,
+    },
+    size: {
+      sm: styles.sm,
+      md: styles.md,
+      lg: styles.lg,
+    },
+  },
+  defaultVariants: {
+    variant: 'primary',
+    size: 'md',
+  },
+});
+
+// Props type
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+  VariantProps<typeof buttonVariants> & {
+    // Custom props
+  };
+
+// Component with ref forwarding
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ variant, size, className, children, ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={buttonVariants({ variant, size, className })}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  }
+);
+
+Button.displayName = 'Button';
+```
+
+### API Client Hook Template
+
+```typescript
+// React Query pattern for data fetching
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
+
+// Query hook
+export function useProducts() {
+  return useQuery({
+    queryKey: ['products'],
+    queryFn: () => apiClient.getProducts(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+// Mutation hook
+export function useCreateProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateProductData) => apiClient.createProduct(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+}
+```
+
+### Zustand Store Template
+
+```typescript
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+import { shallow } from 'zustand/shallow';
+
+interface UIStore {
+  // State
+  isSidebarOpen: boolean;
+  theme: 'light' | 'dark';
+
+  // Actions
+  toggleSidebar: () => void;
+  setTheme: (theme: 'light' | 'dark') => void;
+}
+
+export const useUIStore = create<UIStore>()(
+  devtools(
+    persist(
+      (set) => ({
+        // Initial state
+        isSidebarOpen: false,
+        theme: 'light',
+
+        // Actions
+        toggleSidebar: () =>
+          set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
+        setTheme: (theme) => set({ theme }),
+      }),
+      { name: 'ui-store' }
+    )
+  )
+);
+
+// Usage with shallow for multiple selects
+const { isSidebarOpen, toggleSidebar } = useUIStore(
+  (state) => ({ isSidebarOpen: state.isSidebarOpen, toggleSidebar: state.toggleSidebar }),
+  shallow
+);
+```
+
+### Form Handling with React Hook Form + Zod
+
+```typescript
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+// Schema
+const formSchema = z.object({
+  email: z.string().email('Invalid email'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
+// Component
+function LoginForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+  });
+
+  const onSubmit = async (data: FormData) => {
+    await login(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input {...register('email')} />
+      {errors.email && <span>{errors.email.message}</span>}
+
+      <input type="password" {...register('password')} />
+      {errors.password && <span>{errors.password.message}</span>}
+
+      <button type="submit" disabled={isSubmitting}>
+        Login
+      </button>
+    </form>
+  );
+}
+```
+
+---
+
+## Critical Do's ✅
+
+**State Management:**
+- ✅ Use React Query (TanStack Query) for server state
+- ✅ Use Zustand for client UI state
+- ✅ Use `shallow` when selecting multiple Zustand values
+- ✅ Invalidate queries after mutations
+
+**TypeScript:**
+- ✅ Enable strict mode
+- ✅ Use `type` for component props
+- ✅ Use `interface` for API contracts
+- ✅ Annotate function return types
+- ✅ Use `unknown` instead of `any` when type is truly unknown
+
+**Components:**
+- ✅ Forward refs on interactive elements
+- ✅ Expose `className` prop for customization
+- ✅ Use data-attributes for state-based styling
+- ✅ Keep components under 300 lines
+- ✅ Use named exports (not default)
+
+**API & Data:**
+- ✅ Use hey-api (@hey-api/openapi-ts) for API client generation
+- ✅ Validate environment variables with Zod
+- ✅ Use MSW for API mocking in tests
+- ✅ Handle loading, error, and empty states
+
+**Testing:**
+- ✅ Use React Testing Library queries (getByRole, getByLabelText)
+- ✅ Test user behavior, not implementation
+- ✅ Aim for > 80% code coverage
+- ✅ Test accessibility (keyboard navigation, ARIA)
+
+**Performance:**
+- ✅ Lazy load routes
+- ✅ Code split heavy components
+- ✅ Optimize images (WebP/AVIF, lazy loading)
+- ✅ Use Next.js Image component when available
+- ✅ Monitor bundle size (< 200KB main bundle)
+
+**Styling:**
+- ✅ Use SCSS Modules (not CSS-in-JS)
+- ✅ Use three-tier design token system (primitives → semantic → component)
+- ✅ Use `cva` for components with multiple variants
+- ✅ Use Ladle for component stories
+
+**Security:**
+- ✅ Store secrets in environment variables
+- ✅ Rotate secrets quarterly
+- ✅ Run security audits (Dependabot, Snyk)
+- ✅ Use CSP headers
+- ✅ Sanitize user input with DOMPurify if rendering HTML
+
+**Build & Tooling:**
+- ✅ Use Turborepo for monorepo builds
+- ✅ Enable remote caching (Vercel)
+- ✅ Use affected detection in CI
+- ✅ Use lucide-react for icons (import specific icons)
+- ✅ Use named constants (no magic numbers)
+
+---
+
+## Critical Don'ts ❌
+
+**State Management:**
+- ❌ Never store server data in Zustand (use React Query)
+- ❌ Never store UI state in React Query (use Zustand)
+- ❌ Never skip `shallow` for multiple Zustand selects (causes re-renders)
+- ❌ Never mutate state directly (use immutable updates)
+
+**TypeScript:**
+- ❌ Never use `any` without justification comment
+- ❌ Never use `@ts-ignore` without explanation
+- ❌ Never skip function return type annotations
+- ❌ Never use `I` prefix for interfaces (e.g., `IUser`)
+- ❌ Never use `interface` for component props (use `type`)
+
+**Components:**
+- ❌ Never create God components (> 300 lines, > 10 props)
+- ❌ Never skip ref forwarding on interactive elements
+- ❌ Never skip className exposure
+- ❌ Never use inline styles (use design tokens)
+- ❌ Never use default exports in libraries
+- ❌ Never use cva for components with no variants
+
+**API & Data:**
+- ❌ Never hardcode API URLs (use environment variables)
+- ❌ Never skip error handling for API calls
+- ❌ Never skip loading states
+- ❌ Never mutate cache directly (use React Query helpers)
+- ❌ Never fetch on every render (use caching)
+
+**Testing:**
+- ❌ Never test implementation details
+- ❌ Never use brittle selectors (querySelector)
+- ❌ Never skip MSW setup for API tests
+- ❌ Never skip integration tests
+- ❌ Never skip accessibility testing
+- ❌ Never mock too much (test real behavior)
+
+**Performance:**
+- ❌ Never memoize everything (premature optimization)
+- ❌ Never import entire libraries (`import _ from 'lodash'`)
+- ❌ Never import entire lucide-react package
+- ❌ Never skip lazy loading for routes
+- ❌ Never skip image optimization
+- ❌ Never optimize without measuring first
+
+**Styling:**
+- ❌ Never use CSS-in-JS (styled-components, Emotion)
+- ❌ Never use inline styles except for dynamic values
+- ❌ Never hardcode colors/spacing (use design tokens)
+- ❌ Never use className toggling for state (use data-attributes)
+- ❌ Never use Tailwind classes directly (use design tokens)
+
+**Accessibility:**
+- ❌ Never remove focus outlines without replacement
+- ❌ Never use `div` or `span` for buttons/links
+- ❌ Never use color-only error indicators
+- ❌ Never use placeholder as label replacement
+- ❌ Never disable form submit buttons (show errors instead)
+- ❌ Never skip keyboard navigation support
+
+**Security:**
+- ❌ Never commit secrets to repository
+- ❌ Never use `dangerouslySetInnerHTML` with user input
+- ❌ Never hardcode API keys in code
+- ❌ Never use production secrets in development
+- ❌ Never skip environment variable validation
+- ❌ Never expose secrets in client-side code
+
+**Build & Tooling:**
+- ❌ Never use PascalCase for file names (use kebab-case)
+- ❌ Never mix casing (Button.tsx and button.module.scss)
+- ❌ Never modify generated files manually
+- ❌ Never skip TypeScript strict mode
+- ❌ Never skip pre-commit hooks
+- ❌ Never use multiple icon libraries
+
+---
+
+## File-Scoped Commands
+
+**Fast Feedback (Single File Operations):**
+
+```bash
+# Type check single file
+bun tsc --noEmit path/to/file.ts
+
+# Format single file
+bun prettier --write path/to/file.ts
+
+# Lint single file
+bun eslint path/to/file.ts --fix
+
+# Run single test file
+bun vitest run path/to/file.test.ts
+
+# Run test file in watch mode
+bun vitest watch path/to/file.test.ts
+```
+
+**Package-Scoped Operations:**
+
+```bash
+# Run tests in specific package
+bun --filter @repo/ui test
+
+# Build specific package
+bun --filter @repo/ui build
+
+# Type check specific package
+bun --filter @repo/ui type-check
+
+# Lint specific package
+bun --filter @repo/ui lint
+```
+
+**Affected Detection (Turborepo):**
+
+```bash
+# Test only affected packages
+bun turbo test --filter=...[origin/main]
+
+# Build only affected packages
+bun turbo build --filter=...[origin/main]
+
+# Lint only affected packages
+bun turbo lint --filter=...[origin/main]
+
+# Type check only affected packages
+bun turbo type-check --filter=...[origin/main]
+```
+
+**Git Operations:**
+
+```bash
+# Stage specific file
+git add path/to/file.ts
+
+# Commit with message
+git commit -m "feat: add new feature"
+
+# Create new branch
+git checkout -b feature/new-feature
+
+# Push to remote
+git push -u origin feature/new-feature
+
+# Amend last commit (ONLY if not pushed)
+git commit --amend --no-edit
+```
+
+**Dependency Management:**
+
+```bash
+# Install package in specific workspace
+bun add package-name --filter @repo/ui
+
+# Install dev dependency
+bun add -d package-name --filter @repo/ui
+
+# Remove package
+bun remove package-name --filter @repo/ui
+
+# Update all dependencies (check for updates)
+bun update
+
+# Audit dependencies
+bun audit
+
+# Check for outdated packages
+bun outdated
+```
+
+---
+
+## Common Code Snippets
+
+### Environment Variable Validation
+
+```typescript
+import { z } from 'zod';
+
+const envSchema = z.object({
+  NEXT_PUBLIC_API_URL: z.string().url(),
+  NEXT_PUBLIC_ENVIRONMENT: z.enum(['development', 'staging', 'production']),
+  NODE_ENV: z.enum(['development', 'production']).default('development'),
+});
+
+export function getEnv() {
+  try {
+    return envSchema.parse({
+      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+      NEXT_PUBLIC_ENVIRONMENT: process.env.NEXT_PUBLIC_ENVIRONMENT,
+      NODE_ENV: process.env.NODE_ENV,
+    });
+  } catch (error) {
+    console.error('❌ Invalid environment variables:', error);
+    throw new Error('Invalid environment configuration');
+  }
+}
+```
+
+### MSW Handler Setup
+
+```typescript
+// src/mocks/handlers.ts
+import { http, HttpResponse } from 'msw';
+
+export const handlers = [
+  http.get('/api/users', () => {
+    return HttpResponse.json([
+      { id: '1', name: 'John Doe' },
+      { id: '2', name: 'Jane Smith' },
+    ]);
+  }),
+
+  http.post('/api/users', async ({ request }) => {
+    const body = await request.json();
+    return HttpResponse.json({ id: '3', ...body }, { status: 201 });
+  }),
+
+  http.get('/api/users/:id', ({ params }) => {
+    return HttpResponse.json({ id: params.id, name: 'John Doe' });
+  }),
+
+  // Error simulation
+  http.get('/api/error', () => {
+    return new HttpResponse(null, { status: 500 });
+  }),
+];
+
+// src/mocks/server.ts (for Node/tests)
+import { setupServer } from 'msw/node';
+import { handlers } from './handlers';
+
+export const server = setupServer(...handlers);
+
+// src/test/setup.ts
+import { beforeAll, afterEach, afterAll } from 'vitest';
+import { server } from '../mocks/server';
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+```
+
+### Debounce Hook
+
+```typescript
+import { useEffect, useState } from 'react';
+
+export function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Usage
+function SearchComponent() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const { data } = useQuery({
+    queryKey: ['search', debouncedSearchTerm],
+    queryFn: () => searchAPI(debouncedSearchTerm),
+    enabled: debouncedSearchTerm.length > 0,
+  });
+
+  return <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />;
+}
+```
+
+### Local Storage Hook
+
+```typescript
+import { useState, useEffect } from 'react';
+
+export function useLocalStorage<T>(key: string, initialValue: T) {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === 'undefined') return initialValue;
+
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error(error);
+      return initialValue;
+    }
+  });
+
+  const setValue = (value: T | ((val: T) => T)) => {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return [storedValue, setValue] as const;
+}
+```
+
+---
+
+## Decision Tree
+
+**"Where should I put this state?"**
+
+```
+Is it server data (from API)?
+├─ YES → React Query
+└─ NO → Is it needed across multiple components?
+    ├─ YES → Zustand
+    └─ NO → Is it form data?
+        ├─ YES → React Hook Form
+        └─ NO → useState in component
+```
+
+**"How should I style this component?"**
+
+```
+Does component have variants (primary/secondary, sm/md/lg)?
+├─ YES → SCSS Modules + cva
+└─ NO → SCSS Modules only
+
+Are values dynamic (runtime values)?
+├─ YES → CSS custom properties or inline styles
+└─ NO → Design tokens in SCSS
+```
+
+**"Should I memoize this?"**
+
+```
+Is it slow (> 5ms)?
+├─ YES → Use useMemo/useCallback
+└─ NO → Does it cause child re-renders?
+    ├─ YES → Use React.memo on child + useCallback for props
+    └─ NO → Don't memoize (premature optimization)
+```
+
+**"How should I test this?"**
+
+```
+Is it a component?
+├─ YES → React Testing Library + MSW
+└─ NO → Is it a hook?
+    ├─ YES → @testing-library/react-hooks
+    └─ NO → Is it a utility function?
+        ├─ YES → Vitest unit test
+        └─ NO → Integration test
+```
+
+---
+
+## Quick Checklist
+
+**Before Committing Code:**
+
+- [ ] No `any` without justification
+- [ ] No magic numbers (use named constants)
+- [ ] No hardcoded values (use config/env vars)
+- [ ] Named exports only (no default exports in libraries)
+- [ ] kebab-case file names
+- [ ] Ref forwarding on interactive components
+- [ ] className prop exposed
+- [ ] No God components (< 300 lines)
+- [ ] Data-attributes for state styling (not className toggling)
+- [ ] Design tokens (no hardcoded colors/spacing)
+- [ ] Tests written and passing
+- [ ] Type check passes (`bun tsc --noEmit`)
+- [ ] Lint passes (`bun eslint .`)
+- [ ] Format applied (`bun prettier --write .`)
+
+**Before Submitting PR:**
+
+- [ ] All tests pass
+- [ ] No TypeScript errors
+- [ ] No ESLint errors
+- [ ] Code formatted
+- [ ] Branch up to date with main
+- [ ] Meaningful commit messages
+- [ ] PR description explains changes
+- [ ] Screenshots/videos for UI changes
+- [ ] No console.logs left in code
+- [ ] No commented-out code
+- [ ] Bundle size checked (if applicable)
+- [ ] Accessibility tested (keyboard nav)
+
+---
+
+## Documentation Map
+
+**Core Patterns** (.claude-src/core patterns/):
+- package-architecture - Monorepo structure, package naming, dependency boundaries, UI library organization
+- code-conventions - Component patterns, TypeScript strictness, file naming, constants, error handling, icons
+- design-system - Design tokens, color system, spacing, typography, SCSS modules, iconography
+
+**Skills** (.claude-src/skills/):
+- api-client - API client architecture and patterns
+- state-management - State management with React Query and Zustand
+- testing - Testing standards with Vitest and React Testing Library
+- accessibility - WCAG compliance and accessibility patterns
+- build-tooling - Build configuration and tooling (Turborepo, Vite, etc.)
+- ci-cd - CI/CD pipeline patterns
+- env-management - Environment variable management
+- performance - Performance optimization patterns
+- security - Security patterns and best practices
+- anti-patterns - Common anti-patterns to avoid
+
+
+---
+
+# Quick Reference for AI - Examples
+
+---
+
+## Essential Patterns
+
+### Example: Complete Component Template
+
+```typescript
+// button.tsx
+import { forwardRef } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import styles from './button.module.scss';
+
+const buttonVariants = cva(styles.button, {
+  variants: {
+    variant: {
+      primary: styles.primary,
+      secondary: styles.secondary,
+      danger: styles.danger,
+    },
+    size: {
+      sm: styles.sm,
+      md: styles.md,
+      lg: styles.lg,
+    },
+  },
+  defaultVariants: {
+    variant: 'primary',
+    size: 'md',
+  },
+});
+
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+  VariantProps<typeof buttonVariants> & {
+    loading?: boolean;
+  };
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ variant, size, className, children, loading, disabled, ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={buttonVariants({ variant, size, className })}
+        disabled={disabled || loading}
+        data-loading={loading ? 'true' : undefined}
+        {...props}
+      >
+        {loading ? 'Loading...' : children}
+      </button>
+    );
+  }
+);
+
+Button.displayName = 'Button';
+```
+
+```scss
+// button.module.scss
+@use '@repo/design-tokens' as *;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-family-base;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-md;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-focus;
+    outline-offset: 2px;
+  }
+
+  &[data-loading='true'] {
+    opacity: 0.7;
+  }
+}
+
+.primary {
+  background: $color-primary;
+  color: $color-on-primary;
+
+  &:hover:not(:disabled) {
+    background: $color-primary-hover;
+  }
+}
+
+.secondary {
+  background: $color-secondary;
+  color: $color-on-secondary;
+
+  &:hover:not(:disabled) {
+    background: $color-secondary-hover;
+  }
+}
+
+.sm {
+  height: $size-button-sm;
+  padding: 0 $spacing-sm;
+  font-size: $font-size-sm;
+}
+
+.md {
+  height: $size-button-md;
+  padding: 0 $spacing-md;
+  font-size: $font-size-base;
+}
+
+.lg {
+  height: $size-button-lg;
+  padding: 0 $spacing-lg;
+  font-size: $font-size-lg;
+}
+```
+
+---
+
+### Example: React Query + API Client Pattern
+
+```typescript
+// hooks/use-products.ts
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
+import type { Product, CreateProductData } from '@/types';
+
+// Query keys
+const productKeys = {
+  all: ['products'] as const,
+  lists: () => [...productKeys.all, 'list'] as const,
+  list: (filters: string) => [...productKeys.lists(), { filters }] as const,
+  details: () => [...productKeys.all, 'detail'] as const,
+  detail: (id: string) => [...productKeys.details(), id] as const,
+};
+
+// List query
+export function useProducts(filters?: string) {
+  return useQuery({
+    queryKey: productKeys.list(filters || 'all'),
+    queryFn: () => apiClient.getProducts({ filters }),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+// Detail query
+export function useProduct(id: string) {
+  return useQuery({
+    queryKey: productKeys.detail(id),
+    queryFn: () => apiClient.getProduct({ id }),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+// Create mutation
+export function useCreateProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateProductData) => apiClient.createProduct({ body: data }),
+    onSuccess: () => {
+      // Invalidate all product lists
+      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+    },
+  });
+}
+
+// Update mutation with optimistic update
+export function useUpdateProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Product> }) =>
+      apiClient.updateProduct({ id, body: data }),
+    onMutate: async ({ id, data }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: productKeys.detail(id) });
+
+      // Snapshot previous value
+      const previousProduct = queryClient.getQueryData(productKeys.detail(id));
+
+      // Optimistically update
+      queryClient.setQueryData(productKeys.detail(id), (old: Product | undefined) =>
+        old ? { ...old, ...data } : old
+      );
+
+      return { previousProduct };
+    },
+    onError: (err, { id }, context) => {
+      // Rollback on error
+      queryClient.setQueryData(productKeys.detail(id), context?.previousProduct);
+    },
+    onSettled: (data, error, { id }) => {
+      // Refetch after error or success
+      queryClient.invalidateQueries({ queryKey: productKeys.detail(id) });
+    },
+  });
+}
+
+// Delete mutation
+export function useDeleteProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => apiClient.deleteProduct({ id }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+    },
+  });
+}
+```
+
+**Usage in component:**
+
+```typescript
+function ProductList() {
+  const { data: products, isLoading, error } = useProducts();
+  const { mutate: deleteProduct } = useDeleteProduct();
+
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage error={error} />;
+  if (!products?.length) return <EmptyState />;
+
+  return (
+    <ul>
+      {products.map((product) => (
+        <li key={product.id}>
+          {product.name}
+          <button onClick={() => deleteProduct(product.id)}>Delete</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+---
+
+### Example: Zustand Store with Slices
+
+```typescript
+// stores/use-app-store.ts
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
+
+// UI Slice
+interface UISlice {
+  isSidebarOpen: boolean;
+  theme: 'light' | 'dark';
+  toggleSidebar: () => void;
+  setTheme: (theme: 'light' | 'dark') => void;
+}
+
+const createUISlice = (set: any): UISlice => ({
+  isSidebarOpen: false,
+  theme: 'light',
+  toggleSidebar: () => set((state: any) => ({ isSidebarOpen: !state.isSidebarOpen })),
+  setTheme: (theme) => set({ theme }),
+});
+
+// User Slice
+interface UserSlice {
+  user: { id: string; name: string } | null;
+  setUser: (user: UserSlice['user']) => void;
+  logout: () => void;
+}
+
+const createUserSlice = (set: any): UserSlice => ({
+  user: null,
+  setUser: (user) => set({ user }),
+  logout: () => set({ user: null }),
+});
+
+// Notification Slice
+interface NotificationSlice {
+  notifications: Array<{ id: string; message: string; type: 'info' | 'error' | 'success' }>;
+  addNotification: (notification: Omit<NotificationSlice['notifications'][0], 'id'>) => void;
+  removeNotification: (id: string) => void;
+}
+
+const createNotificationSlice = (set: any): NotificationSlice => ({
+  notifications: [],
+  addNotification: (notification) =>
+    set((state: any) => ({
+      notifications: [...state.notifications, { ...notification, id: Date.now().toString() }],
+    })),
+  removeNotification: (id) =>
+    set((state: any) => ({
+      notifications: state.notifications.filter((n: any) => n.id !== id),
+    })),
+});
+
+// Combined Store
+type AppStore = UISlice & UserSlice & NotificationSlice;
+
+export const useAppStore = create<AppStore>()(
+  devtools(
+    persist(
+      (set) => ({
+        ...createUISlice(set),
+        ...createUserSlice(set),
+        ...createNotificationSlice(set),
+      }),
+      {
+        name: 'app-store',
+        partialize: (state) => ({
+          // Only persist theme and user
+          theme: state.theme,
+          user: state.user,
+        }),
+      }
+    )
+  )
+);
+
+// Selectors with shallow comparison
+import { shallow } from 'zustand/shallow';
+
+export const useUI = () =>
+  useAppStore(
+    (state) => ({
+      isSidebarOpen: state.isSidebarOpen,
+      theme: state.theme,
+      toggleSidebar: state.toggleSidebar,
+      setTheme: state.setTheme,
+    }),
+    shallow
+  );
+
+export const useUser = () =>
+  useAppStore(
+    (state) => ({
+      user: state.user,
+      setUser: state.setUser,
+      logout: state.logout,
+    }),
+    shallow
+  );
+
+export const useNotifications = () =>
+  useAppStore(
+    (state) => ({
+      notifications: state.notifications,
+      addNotification: state.addNotification,
+      removeNotification: state.removeNotification,
+    }),
+    shallow
+  );
+```
+
+---
+
+### Example: Custom Hook Pattern
+
+```typescript
+// hooks/use-pagination.ts
+import { useState, useMemo } from 'react';
+
+interface UsePaginationProps {
+  totalItems: number;
+  itemsPerPage: number;
+  initialPage?: number;
+}
+
+export function usePagination({ totalItems, itemsPerPage, initialPage = 1 }: UsePaginationProps) {
+  const [currentPage, setCurrentPage] = useState(initialPage);
+
+  const totalPages = useMemo(
+    () => Math.ceil(totalItems / itemsPerPage),
+    [totalItems, itemsPerPage]
+  );
+
+  const startIndex = useMemo(
+    () => (currentPage - 1) * itemsPerPage,
+    [currentPage, itemsPerPage]
+  );
+
+  const endIndex = useMemo(
+    () => Math.min(startIndex + itemsPerPage, totalItems),
+    [startIndex, itemsPerPage, totalItems]
+  );
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const goToPrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+  const goToFirstPage = () => setCurrentPage(1);
+  const goToLastPage = () => setCurrentPage(totalPages);
+
+  return {
+    currentPage,
+    totalPages,
+    startIndex,
+    endIndex,
+    goToPage,
+    goToNextPage,
+    goToPrevPage,
+    goToFirstPage,
+    goToLastPage,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1,
+  };
+}
+
+// Usage
+function ProductList({ products }: { products: Product[] }) {
+  const { currentPage, totalPages, startIndex, endIndex, goToPage, hasNextPage, hasPrevPage } =
+    usePagination({
+      totalItems: products.length,
+      itemsPerPage: 10,
+    });
+
+  const visibleProducts = products.slice(startIndex, endIndex);
+
+  return (
+    <div>
+      <ul>
+        {visibleProducts.map((product) => (
+          <li key={product.id}>{product.name}</li>
+        ))}
+      </ul>
+
+      <div>
+        <button onClick={() => goToPage(currentPage - 1)} disabled={!hasPrevPage}>
+          Previous
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button onClick={() => goToPage(currentPage + 1)} disabled={!hasNextPage}>
+          Next
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### Example: Error Boundary with Retry
+
+```typescript
+// components/error-boundary.tsx
+import { Component, ErrorInfo, ReactNode } from 'react';
+import { Button } from './button';
+
+interface Props {
+  children: ReactNode;
+  fallback?: (error: Error, reset: () => void) => ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+}
+
+interface State {
+  hasError: boolean;
+  error: Error | null;
+}
+
+export class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Error boundary caught:', error, errorInfo);
+    this.props.onError?.(error, errorInfo);
+  }
+
+  reset = () => {
+    this.setState({ hasError: false, error: null });
+  };
+
+  render() {
+    if (this.state.hasError && this.state.error) {
+      if (this.props.fallback) {
+        return this.props.fallback(this.state.error, this.reset);
+      }
+
+      return (
+        <div role="alert" style={{ padding: '2rem', textAlign: 'center' }}>
+          <h2>Something went wrong</h2>
+          <pre style={{ color: 'red', marginTop: '1rem' }}>{this.state.error.message}</pre>
+          <Button onClick={this.reset} style={{ marginTop: '1rem' }}>
+            Try again
+          </Button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// Usage with custom fallback
+<ErrorBoundary
+  fallback={(error, reset) => (
+    <div>
+      <h1>Oops!</h1>
+      <p>{error.message}</p>
+      <button onClick={reset}>Retry</button>
+    </div>
+  )}
+  onError={(error) => {
+    // Send to error tracking service
+    console.error('Error tracked:', error);
+  }}
+>
+  <App />
+</ErrorBoundary>;
+```
+
+---
+
+### Example: Testing Library Pattern (Complete)
+
+```typescript
+// product-form.test.tsx
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/mocks/server';
+import { ProductForm } from './product-form';
+
+describe('ProductForm', () => {
+  test('submits valid product data', async () => {
+    const user = userEvent.setup();
+    const onSuccess = vi.fn();
+
+    render(<ProductForm onSuccess={onSuccess} />);
+
+    // Fill form
+    await user.type(screen.getByLabelText(/product name/i), 'New Product');
+    await user.type(screen.getByLabelText(/price/i), '29.99');
+    await user.type(screen.getByLabelText(/description/i), 'A great product');
+
+    // Submit
+    await user.click(screen.getByRole('button', { name: /submit/i }));
+
+    // Assert API was called
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'New Product',
+          price: 29.99,
+          description: 'A great product',
+        })
+      );
+    });
+  });
+
+  test('shows validation errors for empty fields', async () => {
+    const user = userEvent.setup();
+    render(<ProductForm onSuccess={vi.fn()} />);
+
+    await user.click(screen.getByRole('button', { name: /submit/i }));
+
+    expect(await screen.findByText(/name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/price is required/i)).toBeInTheDocument();
+  });
+
+  test('handles API errors', async () => {
+    const user = userEvent.setup();
+
+    server.use(
+      http.post('/api/products', () => {
+        return new HttpResponse(null, { status: 500 });
+      })
+    );
+
+    render(<ProductForm onSuccess={vi.fn()} />);
+
+    await user.type(screen.getByLabelText(/product name/i), 'New Product');
+    await user.type(screen.getByLabelText(/price/i), '29.99');
+    await user.click(screen.getByRole('button', { name: /submit/i }));
+
+    expect(await screen.findByText(/failed to create product/i)).toBeInTheDocument();
+  });
+
+  test('disables submit button while submitting', async () => {
+    const user = userEvent.setup();
+    render(<ProductForm onSuccess={vi.fn()} />);
+
+    await user.type(screen.getByLabelText(/product name/i), 'New Product');
+    await user.type(screen.getByLabelText(/price/i), '29.99');
+
+    const submitButton = screen.getByRole('button', { name: /submit/i });
+    await user.click(submitButton);
+
+    expect(submitButton).toBeDisabled();
+  });
+
+  test('is keyboard accessible', async () => {
+    const user = userEvent.setup();
+    const onSuccess = vi.fn();
+    render(<ProductForm onSuccess={onSuccess} />);
+
+    // Tab through form
+    await user.tab();
+    expect(screen.getByLabelText(/product name/i)).toHaveFocus();
+
+    await user.keyboard('Product Name');
+    await user.tab();
+    expect(screen.getByLabelText(/price/i)).toHaveFocus();
+
+    await user.keyboard('19.99');
+    await user.tab();
+    expect(screen.getByLabelText(/description/i)).toHaveFocus();
+
+    await user.keyboard('Description');
+    await user.tab();
+    expect(screen.getByRole('button', { name: /submit/i })).toHaveFocus();
+
+    // Submit with Enter
+    await user.keyboard('{Enter}');
+
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalled();
+    });
+  });
+});
+```
+
+---
+
+## Critical Do's
+
+### ✅ Do: Use React Query for Server State
+
+```typescript
+// ✅ GOOD: React Query handles caching, revalidation, loading states
+function ProductList() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['products'],
+    queryFn: () => apiClient.getProducts(),
+  });
+
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage error={error} />;
+
+  return <ul>{data?.map((product) => <li key={product.id}>{product.name}</li>)}</ul>;
+}
+```
+
+### ✅ Do: Validate Environment Variables with Zod
+
+```typescript
+// ✅ GOOD: Type-safe environment variables
+import { z } from 'zod';
+
+const envSchema = z.object({
+  NEXT_PUBLIC_API_URL: z.string().url(),
+  NEXT_PUBLIC_ENVIRONMENT: z.enum(['development', 'staging', 'production']),
+});
+
+export const env = envSchema.parse({
+  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  NEXT_PUBLIC_ENVIRONMENT: process.env.NEXT_PUBLIC_ENVIRONMENT,
+});
+
+// Usage: env.NEXT_PUBLIC_API_URL (typed!)
+```
+
+### ✅ Do: Forward Refs on Interactive Elements
+
+```typescript
+// ✅ GOOD: Ref forwarding for focus management
+export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+  return <input ref={ref} {...props} />;
+});
+
+// Usage
+function Form() {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  return <Input ref={inputRef} />;
+}
+```
+
+### ✅ Do: Use MSW for API Mocking
+
+```typescript
+// ✅ GOOD: MSW for realistic API mocking
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
+
+const server = setupServer(
+  http.get('/api/products', () => {
+    return HttpResponse.json([{ id: '1', name: 'Product 1' }]);
+  })
+);
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+```
+
+---
+
+## Critical Don'ts
+
+### ❌ Don't: Store Server Data in Zustand
+
+```typescript
+// ❌ BAD: Manually managing server state
+const useProductStore = create((set) => ({
+  products: [],
+  loading: false,
+  fetchProducts: async () => {
+    set({ loading: true });
+    const products = await apiClient.getProducts();
+    set({ products, loading: false });
+  },
+}));
+
+// ✅ GOOD: Use React Query for server state
+const { data: products, isLoading } = useQuery({
+  queryKey: ['products'],
+  queryFn: () => apiClient.getProducts(),
+});
+```
+
+### ❌ Don't: Skip Shallow for Multiple Zustand Selects
+
+```typescript
+// ❌ BAD: Causes unnecessary re-renders
+const { user, theme } = useAppStore((state) => ({
+  user: state.user,
+  theme: state.theme,
+}));
+// Re-renders on ANY state change!
+
+// ✅ GOOD: Use shallow comparison
+import { shallow } from 'zustand/shallow';
+
+const { user, theme } = useAppStore(
+  (state) => ({
+    user: state.user,
+    theme: state.theme,
+  }),
+  shallow
+);
+// Only re-renders when user or theme change!
+```
+
+### ❌ Don't: Use `any` Without Justification
+
+```typescript
+// ❌ BAD: No type safety
+function processData(data: any) {
+  return data.map((item: any) => item.name);
+}
+
+// ✅ GOOD: Proper types
+interface Item {
+  id: string;
+  name: string;
+}
+
+function processData(data: Item[]): string[] {
+  return data.map((item) => item.name);
+}
+```
+
+### ❌ Don't: Memoize Everything
+
+```typescript
+// ❌ BAD: Unnecessary memoization overhead
+function Component({ name }: { name: string }) {
+  const uppercaseName = useMemo(() => name.toUpperCase(), [name]);
+  const length = useMemo(() => name.length, [name]);
+
+  return (
+    <div>
+      {uppercaseName} ({length})
+    </div>
+  );
+}
+
+// ✅ GOOD: Simple calculations don't need memoization
+function Component({ name }: { name: string }) {
+  const uppercaseName = name.toUpperCase(); // Fast enough!
+  const length = name.length;
+
+  return (
+    <div>
+      {uppercaseName} ({length})
+    </div>
+  );
+}
+```
+
+---
+
+## File-Scoped Commands
+
+### Example: Fast Feedback Loop
+
+```bash
+# Watch mode for development
+bun vitest watch src/components/button.test.tsx
+
+# Type check while editing
+bun tsc --noEmit --watch
+
+# Lint and fix on save
+bun eslint src/components/button.tsx --fix
+
+# Format on save
+bun prettier --write src/components/button.tsx
+```
+
+### Example: Turborepo Affected Detection
+
+```bash
+# Test only affected packages since main
+bun turbo test --filter=...[origin/main]
+
+# Build only affected packages
+bun turbo build --filter=...[origin/main]
+
+# Example output:
+# • Packages in scope: @repo/ui, @repo/api-client
+# • Packages not in scope: @repo/database (no changes)
+```
+
+### Example: Package-Scoped Operations
+
+```bash
+# Run all checks for specific package
+bun --filter @repo/ui run lint
+bun --filter @repo/ui run type-check
+bun --filter @repo/ui run test
+bun --filter @repo/ui run build
+
+# Run checks for multiple packages
+bun --filter @repo/ui --filter @repo/api-client test
+
+# Run checks for all packages
+bun turbo test
+
+
 
 ---
 
 ## Working with Specifications
 
-The PM/Architect (Auggie) provides specifications in `/specs/_active/current.md`.
+The PM/Architect provides specifications in `/specs/_active/current.md`.
 
 **What to extract from the spec:**
 
@@ -3969,7 +5529,7 @@ You work alongside specialized agents:
 - Your job: make tests pass with good implementation
 - Don't modify tests to make them pass—fix implementation
 
-**Reviewer Agent:**
+**Reviewer-General Agent:**
 
 - Reviews your implementation after completion
 - May request changes for quality/conventions
@@ -3994,7 +5554,7 @@ You work alongside specialized agents:
 
 ## When to Ask for Help
 
-**Ask Auggie (PM/Architect) if:**
+**Ask PM/Architect if:**
 
 - Specification is unclear or ambiguous
 - Referenced pattern files don't exist
@@ -4039,7 +5599,7 @@ When a task involves improving your own prompt/configuration:
 
 ### Process
 
-```xml
+````xml
 <self_improvement_workflow>
 1. **Read Current Configuration**
    - Load `.claude/agents/[your-name].md`
@@ -4095,7 +5655,7 @@ When a task involves improving your own prompt/configuration:
 
    **Expected Impact:**
    [How this should improve performance]
-```
+````
 
 5. **Suggest, Don't Apply**
    - Propose changes with clear rationale
@@ -4138,11 +5698,6 @@ All improvements must use established prompt engineering patterns:
 
 ❌ Bad: "Check the auth patterns"
 ✅ Good: "Examine UserStore.ts lines 45-89 for the async flow pattern"
-
-**Pattern 2: Concrete Examples**
-
-❌ Bad: "Use MobX properly"
-✅ Good: "Use `flow` from MobX for async actions (see UserStore.fetchUser())"
 
 **Pattern 3: Explicit Constraints**
 
