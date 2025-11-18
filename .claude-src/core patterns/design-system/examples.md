@@ -157,6 +157,33 @@
 
 **Why:** Semantic naming makes color purpose clear, not just the value.
 
+### Example: RGB Format with CSS Color Functions
+
+```scss
+// ✅ CORRECT: RGB format
+.card {
+  background: rgb(255 255 255);
+  color: rgb(0 0 0 / 0.8);  // Transparency with space-separated syntax
+}
+
+.button {
+  background: var(--color-primary);
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-primary), white 10%);  // Lighten
+  }
+}
+
+// ❌ WRONG: Don't use hex or Sass functions
+.card {
+  background: #ffffff;                           // NO!
+  background: rgba(0, 0, 0, 0.5);               // NO!
+  background: darken($color-primary, 10%);      // NO!
+}
+```
+
+**Why:** RGB format eliminates Sass dependencies and works better with design tokens.
+
 ---
 
 ## Spacing System
@@ -360,11 +387,129 @@ Button.displayName = "Button";
 
 **Why:** SCSS Modules provide scoped styles. cva provides type-safe variants. Design tokens ensure consistency.
 
+### Example: File Naming and Organization
+
+```
+packages/ui/src/
+├── components/
+│   ├── button/
+│   │   ├── button.tsx              # Component
+│   │   ├── button.module.scss      # Styles (matches component name)
+│   │   └── button.stories.tsx      # Stories
+│   ├── dropdown-menu/
+│   │   ├── dropdown-menu.tsx       # Use hyphens for multi-word names
+│   │   ├── dropdown-menu.module.scss
+│   │   └── dropdown-menu.stories.tsx
+│   └── select/
+│       ├── select.tsx
+│       ├── select.module.scss
+│       └── select.stories.tsx
+├── patterns/
+│   ├── feature/
+│   │   ├── feature.tsx
+│   │   └── feature.module.scss
+│   └── navigation/
+│       ├── navigation.tsx
+│       └── navigation.module.scss
+└── primitives/
+    └── skeleton/
+        ├── skeleton.tsx
+        └── skeleton.module.scss
+```
+
+**Naming Rules:**
+
+```
+✅ CORRECT:
+- button.tsx → button.module.scss
+- dropdown-menu.tsx → dropdown-menu.module.scss
+- user-profile.tsx → user-profile.module.scss
+
+❌ WRONG:
+- button.tsx → Button.module.scss     (Capital letter)
+- button.tsx → button-styles.scss     (Wrong suffix)
+- button.tsx → buttonStyles.scss      (camelCase instead of hyphens)
+- button.tsx → button.scss            (Missing .module)
+```
+
+**Why:** Consistent naming makes files easy to find, matches component names exactly, and follows CSS Modules conventions.
+
 ---
 
 ## Component Architecture
 
 See code-conventions/examples.md Component Architecture section for detailed component examples.
+
+---
+
+## Component Structure Standards
+
+### Example: Well-Structured Component
+
+```scss
+// ✅ GOOD: Variables at top, semantic names, data-attributes for state
+.card {
+  // Component variables at top
+  --card-padding: var(--space-lg);
+  --card-gap: var(--space-md);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+  padding: var(--card-padding);
+  background: var(--color-surface-base);
+  border: 1px solid var(--color-surface-subtle);
+
+  // Semantic nested elements
+  .cardTitle {
+    font-size: var(--text-size-heading);
+    color: var(--color-text-default);
+  }
+
+  // State with data-attributes
+  &[data-state="selected"] {
+    border-color: var(--color-primary);
+  }
+}
+
+.cardCompact {
+  --card-padding: var(--space-md);
+}
+```
+
+**Why:** Variables at top, semantic names describe purpose, data-attributes handle state cleanly.
+
+### Example: Semantic vs Non-Semantic Class Names
+
+```scss
+// ❌ BAD: Non-semantic class names (describe appearance, not purpose)
+.blueButton {
+  background: var(--color-primary);  // What if primary isn't blue?
+}
+
+.bigText {
+  font-size: var(--text-size-heading);  // Purpose unclear
+}
+
+.leftSection {
+  padding: var(--space-lg);  // Layout changes break naming
+}
+
+// ✅ GOOD: Semantic class names (describe purpose)
+.submitButton {
+  background: var(--color-primary);  // Purpose is clear
+}
+
+.pageTitle {
+  font-size: var(--text-size-heading);  // Role is clear
+}
+
+.sidebarContent {
+  padding: var(--space-lg);  // Purpose stays consistent
+}
+```
+
+**Why:** Semantic names remain accurate when visual design changes. `.submitButton` makes sense even if you change its color from blue to green.
 
 ---
 
@@ -431,6 +576,65 @@ See code-conventions/examples.md Component Architecture section for detailed com
 ```
 
 **Key Principle:** Only create component variables when they provide real value through reuse, variation, or runtime modification.
+
+---
+
+## Advanced CSS Features
+
+### Example: :has() and Data-Attributes
+
+```scss
+// :has() for parent styling based on child state
+.form:has(.inputError) {
+  border-color: var(--color-error);
+}
+
+.formGroup:has(input:focus) {
+  background: var(--color-surface-subtle);
+}
+
+// Data-attributes for state management
+.dropdown {
+  &[data-open="true"] {
+    display: block;
+  }
+
+  &[data-state="error"] {
+    border-color: var(--color-error);
+  }
+
+  &[data-size="large"][data-variant="primary"] {
+    padding: var(--space-xlg);
+  }
+}
+```
+
+### Example: :global() and Nesting
+
+```scss
+// ✅ GOOD: Minimal :global() use
+.component {
+  padding: var(--space-md);
+
+  :global(.dark-mode) & {
+    background: var(--color-surface-strong);
+  }
+}
+
+// ✅ GOOD: Shallow nesting (max 3 levels)
+.nav {
+  .navItem {
+    &:hover {
+      background: var(--color-surface-subtle);
+    }
+  }
+}
+
+// ❌ BAD: Deep nesting
+.nav .navList .navItem .navLink .navIcon { }  // Too deep!
+```
+
+**Why:** Modern CSS features reduce JavaScript complexity and improve performance.
 
 ---
 

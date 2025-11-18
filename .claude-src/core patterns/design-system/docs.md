@@ -1,12 +1,12 @@
 # Design System
 
-> **Quick Guide:** Two-tier token system (Core → Semantic) with Open Props foundation. Semantic color tokens for text/surface/accent. 2px-based spacing scale. lucide-react for icons. SCSS Modules for all components. Create component variables only when they add value through reuse or variation.
+> **Quick Guide:** Two-tier token system (Core → Semantic) with Open Props foundation. Semantic color tokens for text/surface/accent. 2px-based spacing scale. lucide-react for icons. SCSS Modules for all components (.module.scss). RGB color format with CSS color functions. Create component variables only when they add value through reuse or variation. Use semantic class names (purpose, not appearance). Data-attributes for state management. Modern CSS (:has(), proper nesting, max 3 levels).
 
 ---
 
 ## Token Architecture
 
-**ACTUAL IMPLEMENTATION: Two-tier system (Core → Semantic)**
+**Two-tier system (Core → Semantic)**
 
 **Location:** `packages/ui/src/styles/variables.scss`
 
@@ -23,7 +23,7 @@
 
 ### Open Props Foundation
 
-**ACTUAL IMPLEMENTATION: Open Props as base design token library**
+**Open Props as base design token library**
 
 Open Props provides battle-tested design tokens. Semantic tokens reference Open Props. Components never use Open Props directly.
 
@@ -55,7 +55,7 @@ Open Props provides battle-tested design tokens. Semantic tokens reference Open 
 
 ## Color System
 
-**ACTUAL IMPLEMENTATION: Semantic color tokens referencing Open Props**
+**Semantic color tokens referencing Open Props**
 
 **Location:** `packages/ui/src/styles/variables.scss`
 
@@ -81,11 +81,63 @@ Open Props provides battle-tested design tokens. Semantic tokens reference Open 
 }
 ```
 
+### Color Format Requirements
+
+**RGB format with CSS color functions**
+
+**Rules:**
+
+- **Use RGB format for all colors:** `rgb(255 255 255)` instead of hex `#FFFFFF` or `rgba()`
+- **Use CSS color functions for derived colors:**
+  - Transparency: `rgb(0 0 0 / var(--opacity-medium))` or `rgb(0 0 0 / 0.5)`
+  - Color mixing: `color-mix(in srgb, var(--color-primary), black 5%)`
+  - Modern space-separated syntax: `rgb(255 255 255 / 0.5)` NOT `rgba(255, 255, 255, 0.5)`
+- **Never use Sass color functions:** No `darken()`, `lighten()`, `transparentize()`, etc.
+- **Avoid hard-coding color values directly** in component styles
+
+**Why RGB format:**
+
+- Better for design token systems and theming
+- Native CSS color functions work with RGB
+- Space-separated syntax enables CSS variable usage for opacity
+- Eliminates need for Sass color manipulation
+
+**Example:**
+
+```scss
+// ✅ CORRECT: RGB with CSS color functions
+.button {
+  background: rgb(255 255 255);
+  color: rgb(0 0 0 / 0.8); // 80% opacity
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-primary), white 10%);
+  }
+}
+
+// ❌ WRONG: Hex colors and Sass functions
+.button {
+  background: #ffffff;
+  color: rgba(0, 0, 0, 0.8);
+
+  &:hover {
+    background: darken($primary-color, 10%); // Don't use Sass functions
+  }
+}
+```
+
+**RED FLAGS:**
+
+- ❌ Using hex colors (`#FFFFFF`, `#000000`)
+- ❌ Using comma-separated rgba syntax (`rgba(0, 0, 0, 0.5)`)
+- ❌ Using Sass color functions (`darken`, `lighten`, `transparentize`)
+- ❌ Hard-coding color values instead of using design tokens
+
 ---
 
 ## Spacing System
 
-**ACTUAL IMPLEMENTATION: 2px base unit with calculated multiples**
+**2px base unit with calculated multiples**
 
 **Location:** `packages/ui/src/styles/variables.scss`
 
@@ -124,7 +176,7 @@ Open Props provides battle-tested design tokens. Semantic tokens reference Open 
 
 ## Typography
 
-**ACTUAL IMPLEMENTATION: REM-based with semantic naming**
+**REM-based with semantic naming**
 
 **Location:** `packages/ui/src/styles/variables.scss`
 
@@ -167,7 +219,7 @@ h1 {
 
 ## SCSS Modules Pattern
 
-**ACTUAL IMPLEMENTATION: 100% of components use SCSS Modules**
+**100% of components use SCSS Modules**
 
 **Pattern:** CSS Modules with SCSS for component styling
 
@@ -190,7 +242,7 @@ import styles from "./button.module.scss";
 
 ## Component Architecture
 
-**ACTUAL IMPLEMENTATION: Four-tier hierarchy with cva for variants**
+**Four-tier hierarchy with cva for variants**
 
 **Hierarchy:**
 
@@ -211,6 +263,57 @@ import styles from "./button.module.scss";
 
 ---
 
+## Component Structure Standards
+
+**Structure components with semantic classes and logical nesting**
+
+**Key Principles:**
+
+- Use design tokens directly from `variables.scss` in component styles
+- Create component-specific variables ONLY when they add value (see criteria below)
+- Define component variables at the top using `--component-[property]` naming format
+- Structure components with logical nesting and clear separation of parts
+- Use semantic class names that describe purpose, not appearance (e.g., `.submitButton` not `.blueButton`)
+- Use data-attributes for state-based styling: `&[data-state="open"]`, `&[data-active="true"]`
+
+**Example:**
+
+```scss
+.modal {
+  // Component variables defined at top
+  --modal-width: 600px;
+  --modal-padding: var(--space-lg);
+
+  // Base styles using design tokens
+  width: var(--modal-width);
+  padding: var(--modal-padding);
+  background: var(--color-surface-base);
+  border-radius: var(--radius-sm);
+
+  // Nested elements with semantic names
+  .modalHeader {
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--color-surface-subtle);
+  }
+
+  .modalTitle {
+    font-size: var(--text-size-heading);
+    color: var(--color-text-default);
+  }
+
+  // State-based styling with data-attributes
+  &[data-state="open"] {
+    display: block;
+  }
+
+  &[data-state="closed"] {
+    display: none;
+  }
+}
+```
+
+---
+
 ## Component-Specific Variables
 
 **GUIDANCE: Create component variables only when they add value**
@@ -218,16 +321,19 @@ import styles from "./button.module.scss";
 **✅ CREATE variables for:**
 
 - Values used multiple times within the component
-- Values that change based on variants/states
+- Values that change based on variants/states (sizes, themes)
 - Complex calculated values that would be repeated
 - Values that might need runtime modification via JavaScript
+- Component-specific sizing systems (e.g., avatar sizes: sm, md, lg, xl)
 
 **❌ DON'T CREATE variables for:**
 
 - Simple, single-use values like `1px`, `2px` for borders
 - Standard font-weights like `600`, `500` used once
-- Values that already exist as design tokens
+- Values that already exist as design tokens (avoid redeclaration)
 - One-off calculations that aren't reused
+
+**Naming Convention:** Use `--component-[property]` format (e.g., `--button-padding`, `--modal-width`)
 
 **Example of good usage:**
 
@@ -265,11 +371,82 @@ import styles from "./button.module.scss";
 }
 ```
 
+**RED FLAGS:**
+
+- ❌ Redeclaring existing design tokens as component variables
+- ❌ Creating variables for every single value in a component
+- ❌ Using non-standard naming conventions (use `--component-[property]`)
+- ❌ Defining variables inline instead of at the top of the component
+
+---
+
+## Advanced CSS Features
+
+**Modern CSS with :has(), :global(), and data-attributes**
+
+**Supported patterns:**
+
+- **`:has()` for conditional styling** - Style parent based on child state
+- **`:global()` for handling global classes** - Escape CSS Modules scoping when needed
+- **Proper nesting with `&`** - SCSS nesting for modifiers and states
+- **CSS classes for variants** - Use `cva` for type-safe variant classes
+- **Data-attributes for state** - `&[data-state="open"]`, `&[data-active="true"]`
+
+**Examples:**
+
+```scss
+// :has() for parent styling based on children
+.container:has(.error) {
+  border-color: var(--color-error);
+}
+
+// :global() for global class handling
+.component {
+  :global(.dark-mode) & {
+    background: var(--color-surface-strong);
+  }
+}
+
+// Proper nesting with &
+.button {
+  &:hover {
+    background: var(--color-surface-subtle);
+  }
+
+  &[data-active="true"] {
+    color: var(--color-accent);
+  }
+}
+
+// Variants using CSS classes (used with cva)
+.btnDefault {
+  background: var(--color-surface-base);
+}
+
+.btnGhost {
+  background: transparent;
+}
+```
+
+**Best Practices:**
+
+- Use data-attributes for boolean states: `data-active`, `data-state`, `data-variant`
+- Prefer `:has()` over JavaScript for simple parent-child relationships
+- Use `:global()` sparingly, only when necessary for third-party integration
+- Keep nesting shallow (max 3 levels) for maintainability
+
+**RED FLAGS:**
+
+- ❌ Deep nesting (4+ levels) - harder to maintain
+- ❌ Overusing `:global()` - defeats CSS Modules purpose
+- ❌ Using inline styles in JavaScript instead of CSS classes
+- ❌ Mixing state management approaches (pick data-attributes OR classes, not both)
+
 ---
 
 ## Iconography
 
-**ACTUAL IMPLEMENTATION: lucide-react icon library**
+**lucide-react icon library**
 
 **Library:** `lucide-react` (installed in `packages/ui`)
 
