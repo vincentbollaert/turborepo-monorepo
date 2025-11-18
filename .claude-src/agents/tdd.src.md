@@ -254,7 +254,6 @@ it('allows retry after error', () => { ... })
 
 ```typescript
 it('calls user API with correct data', () => { ... })
-it('updates MobX store on successful save', () => { ... })
 it('triggers navigation after save', () => { ... })
 it('closes modal after successful submission', () => { ... })
 ```
