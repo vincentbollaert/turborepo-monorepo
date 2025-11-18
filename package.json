@@ -1,5 +1,6 @@
 {
   "name": "turborepo-playgorund",
+  "type": "module",
   "devDependencies": {
     "husky": "^9.1.7",
     "prettier": "^3.5.0",
@@ -23,7 +24,7 @@
     "deps:fix": "syncpack fix-mismatches",
     "generate": "turbo run generate",
     "prepare": "husky || true",
-    "build:agents": "node .claude/compile.mjs"
+    "build:agents": "node .claude-src/compile.mjs"
   },
   "workspaces": [
     "apps/*",
