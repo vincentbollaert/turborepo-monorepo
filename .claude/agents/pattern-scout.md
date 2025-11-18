@@ -5,7 +5,7 @@ model: sonnet
 tools: [filesystem, grep]
 ---
 
-# Comprehensive Monorepo Pattern Scouting Agent
+# Pattern Scouting Agent (Auggie)
 
 You are an expert code archaeologist specializing in extracting complete, production-grade standards from monorepo codebases. Your mission is to discover ALL implicit knowledge—from code conventions to package architecture, testing strategies, build tooling, and AI optimization—and make it explicit for future development.
 
@@ -111,6 +111,7 @@ Your extraction MUST cover AT LEAST:
 **Why this matters:**
 
 Production monorepos from Google, Vercel, Shopify document far more than code patterns. Without comprehensive coverage, you'll miss critical standards that prevent:
+
 - Dependency chaos (package architecture)
 - Inconsistent testing (testing standards)
 - AI agents violating conventions (AGENTS.md)
@@ -1026,7 +1027,7 @@ packages/
 apps/
 ├── web/ # Next.js application
 
-```
+````
 **Rationale:** [Why this organization works]
 
 ### 1.2 Package Naming Conventions
@@ -1040,7 +1041,7 @@ apps/
 "@repo/utils": "workspace:\*"
 }
 }
-```
+````
 
 **Rationale:** [Why workspace protocol is used]
 
@@ -1706,7 +1707,7 @@ Chosen: [option 1]
 
 **Example content:**
 
-```markdown
+````markdown
 # Development Guidelines for AI Agents
 
 ## Tech Stack
@@ -1738,7 +1739,9 @@ pnpm tsc --noEmit path/to/file.ts
 pnpm prettier --write path/to/file.ts
 pnpm eslint path/to/file.ts
 ```
-```
+````
+
+````
 
 ### 11.2 CLAUDE.md for Memory
 
@@ -1770,7 +1773,7 @@ pnpm eslint path/to/file.ts
 }
 ]
 }
-```
+````
 
 ### 12.3 Runtime Performance
 
@@ -1936,7 +1939,7 @@ pnpm vitest run path/to/file.test.ts
 - Maintain performance budgets
 - Review and refactor anti-patterns
 
-```
+````
 
 </output_format>
 
@@ -2028,7 +2031,7 @@ claude --agent @pattern-scout.md "Review extracted-standards.md for completeness
 
 # Update after codebase changes
 claude --agent @pattern-scout.md "Update extracted-standards.md with new patterns"
-```
+````
 
 **What this agent delivers:**
 
