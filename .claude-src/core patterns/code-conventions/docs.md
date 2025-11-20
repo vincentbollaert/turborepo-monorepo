@@ -12,7 +12,7 @@
 - **Polymorphic components**: Use `asChild` prop pattern for flexibility (design system components)
 - **Ref forwarding**: All interactive components must use `React.forwardRef`
 - **className prop exposure**: Allow style customization from parent
-- **Type over Interface**: Use `type` for component props (enables intersections with VariantProps when needed)
+- **Always use type for props**: Use `type` for all component props (enables intersections, unions, and VariantProps integration)
 - **Design system component patterns**:
   - Components expose `className` for overrides
   - Components use `forwardRef` for ref access
@@ -41,7 +41,8 @@
 - ❌ God components (>300 lines, >10 props)
 - ❌ Inline styles instead of using design tokens
 - ❌ Using cva for components with no variants (over-engineering)
-- ❌ Using `interface` instead of `type` for props when using VariantProps
+- ❌ Using `interface` instead of `type` for component props
+- ❌ Missing display names on forwardRef components
 
 ---
 
@@ -153,10 +154,9 @@ bun run lint
 
 ## Type Definitions
 
-**RULE: Use `type` for component props, `interface` for extendable objects**
+**RULE: Always use `type` for component props**
 
-- **Type for component props**: Enables intersection with `VariantProps<typeof variants>`
-- **Interface for data models**: When extension is needed
+- **Always use `type` for component props**: Enables intersections, unions, and VariantProps integration
 - **Type for unions, intersections, mapped types**
 - **Co-located type definitions**: Types live with their components
 - **Exported types**: Export both component and its props type
@@ -165,6 +165,8 @@ bun run lint
 - **Type inference over explicit typing** (when safe)
 - **No `I` prefix for interfaces** (avoid IProduct, use Product)
 
+### Standard Components
+
 **Pattern:**
 
 ```typescript
@@ -172,16 +174,56 @@ export type ButtonProps = React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
   };
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ variant, size, className, ...props }, ref) => {
+    return <button ref={ref} {...props} />
+  }
+)
+Button.displayName = "Button"
 ```
 
-**Rationale:** `type` allows intersection with VariantProps from cva, co-location makes types easier to find and maintain.
+### Radix UI Components
+
+**Pattern:** Extract types from Radix primitives using utility types
+
+```typescript
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+
+const DialogOverlay = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Overlay
+    ref={ref}
+    className={clsx(styles.overlay, className)}
+    {...props}
+  />
+))
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
+```
+
+**Type Extraction Utilities:**
+- `React.ElementRef<T>` - Extracts the ref type (e.g., `HTMLDivElement`)
+- `React.ComponentPropsWithoutRef<T>` - Extracts all props except ref
+- Ensures type safety without duplicating Radix type definitions
+- Automatically stays in sync with library updates
+
+**Why this pattern:**
+- No manual type duplication
+- Stays in sync with Radix primitive updates
+- Type-safe prop spreading
+- Proven in production components
+
+**Rationale:** `type` allows intersection with VariantProps from cva and complex type operations. Co-location makes types easier to find and maintain.
 
 **RED FLAGS:**
 
-- ❌ Using `interface` for component props (breaks VariantProps)
+- ❌ Using `interface` for component props
 - ❌ Using `I` prefix for interfaces (IProduct)
 - ❌ Types far from their usage
 - ❌ Not exporting prop types alongside components
+- ❌ Manually duplicating Radix primitive types
 
 ---
 
@@ -377,6 +419,37 @@ components/button/
 - ❌ Incomplete variant coverage in stories
 - ❌ No usage examples in stories
 - ❌ Creating stories for app-specific features (unnecessary)
+
+---
+
+## Component Display Names
+
+**MANDATORY: Set displayName on all forwardRef components**
+
+```typescript
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, ...props }, ref) => {
+    return <button ref={ref} {...props} />
+  }
+)
+Button.displayName = "Button"
+
+// For Radix wrappers, use primitive's displayName
+const DialogOverlay = React.forwardRef<...>(...)
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
+```
+
+**Benefits:**
+- Better React DevTools experience
+- Shows `<Button>` instead of `<ForwardRef>`
+- Maintains Radix component names in tree
+- Easier debugging and inspection
+
+**RED FLAGS:**
+
+- ❌ forwardRef components without displayName
+- ❌ Generic displayName like "Component" or "Wrapper"
+- ❌ Not using primitive's displayName for Radix wrappers
 
 ---
 

@@ -1,137 +1,192 @@
 # Design System
 
-> **Quick Guide:** Two-tier token system (Core → Semantic) with Open Props foundation. Semantic color tokens for text/surface/accent. 2px-based spacing scale. lucide-react for icons. SCSS Modules for all components (.module.scss). RGB color format with CSS color functions. Create component variables only when they add value through reuse or variation. Use semantic class names (purpose, not appearance). Data-attributes for state management. Modern CSS (:has(), proper nesting, max 3 levels).
+> **Quick Guide:** Two-tier token system (Base primitives → Semantic tokens). Tiered components (Primitives → Components → Patterns → Templates). Foreground/background color pairs. Components use semantic tokens only. SCSS Modules + mixins. HSL format. Dark mode via `.dark` class. Data-attributes for state.
 
 ---
 
 ## Token Architecture
 
-**Two-tier system (Core → Semantic)**
+**Two-tier token system (self-contained)**
 
-**Location:** `packages/ui/src/styles/variables.scss`
+**Location:** `packages/ui/src/styles/design-tokens.scss`
 
-- **Tier 1: Core tokens** - Base primitives defined locally
-  - `--core-space-unit`, `--core-space-2`, `--core-space-4`, etc.
-  - `--core-text-size-1`, `--core-text-size-2`, `--core-text-size-3`
-- **Tier 2: Semantic tokens** - Purpose-driven tokens that reference Core or Open Props
-  - `--color-primary`, `--color-accent`, `--color-text-default`
-  - `--space-sm`, `--space-md`, `--space-lg`
-  - `--text-size-body`, `--text-size-heading`
-  - `--radius-sm`, `--radius-md`, `--shadow-md`
-
-**Pattern:** Components use semantic tokens ONLY, never core tokens or Open Props variables directly
-
-### Open Props Foundation
-
-**Open Props as base design token library**
-
-Open Props provides battle-tested design tokens. Semantic tokens reference Open Props. Components never use Open Props directly.
-
-**Example:**
+**Tier 1: Base tokens** - Raw HSL values
 
 ```scss
-// packages/ui/src/styles/variables.scss
-// ✅ CORRECT: Semantic tokens reference Open Props
---color-primary: var(--blue-2); // From Open Props
---color-accent: var(--cyan-4); // From Open Props
---shadow-md: var(--shadow-2); // From Open Props
+--color-white: 0 0% 100%;
+--color-gray-900: 222.2 84% 4.9%;
+--color-blue-500: 221.2 83.2% 53.3%;
+```
 
-// ✅ Component usage (always use semantic tokens)
-.button {
-  color: var(--color-primary); // NOT var(--blue-2)
-  box-shadow: var(--shadow-md); // NOT var(--shadow-2)
+**Tier 2: Semantic tokens** - Reference base tokens
+
+```scss
+--color-background: var(--color-white);
+--color-foreground: var(--color-gray-900);
+--color-primary: var(--color-blue-500);
+--color-primary-foreground: var(--color-white);
+```
+
+**Pattern:** Components use semantic tokens ONLY, never base tokens
+
+### Token Organization
+
+```scss
+:root {
+  // ============================================
+  // TIER 1: BASE TOKENS (Raw HSL values)
+  // ============================================
+
+  // Colors
+  --color-white: 0 0% 100%;
+  --color-gray-900: 222.2 84% 4.9%;
+  --color-blue-500: 221.2 83.2% 53.3%;
+  --color-blue-50: 210 40% 98%;
+  --color-red-500: 0 84.2% 60.2%;
+
+  // Spacing
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-4: 1rem;
+
+  // Typography
+  --font-size-12: 0.75rem;
+  --font-size-14: 0.875rem;
+  --font-weight-500: 500;
+
+  // ============================================
+  // TIER 2: SEMANTIC TOKENS (Reference Tier 1)
+  // ============================================
+
+  // Base colors (with foreground pairs)
+  --color-background: var(--color-white);
+  --color-foreground: var(--color-gray-900);
+
+  // Interactive colors (with foreground pairs)
+  --color-primary: var(--color-blue-500);
+  --color-primary-foreground: var(--color-blue-50);
+  --color-destructive: var(--color-red-500);
+  --color-destructive-foreground: var(--color-white);
+
+  --color-border: var(--color-gray-200);
+  --color-ring: var(--color-blue-500);
+
+  // Spacing
+  --space-sm: var(--space-2);
+  --space-md: var(--space-4);
+
+  // Typography
+  --font-size-sm: var(--font-size-14);
+  --font-weight-medium: var(--font-weight-500);
+
+  // Transitions
+  --transition-colors: color 150ms ease, background-color 150ms ease;
+}
+
+// Dark mode overrides (Tier 2 semantic tokens only)
+.dark {
+  --color-background: var(--color-gray-900);
+  --color-foreground: var(--color-white);
+  --color-primary: var(--color-blue-400);
+  --color-border: var(--color-gray-700);
 }
 ```
 
-**Commonly used:** Colors (`--gray-*`, `--blue-*`, `--cyan-4`), Shadows (`--shadow-1/2/3`), Spacing.
+**Pattern:** Components use design tokens ONLY - no Open Props, no external dependencies
 
 **RED FLAGS:**
 
-- ❌ Using Open Props variables directly in components (bypasses semantic layer)
-- ❌ Mixing custom color scales with Open Props (creates inconsistency)
+- ❌ Using external token libraries (creates dependency)
 - ❌ Not using semantic tokens (makes theme changes difficult)
+- ❌ Redeclaring design tokens as component variables (unnecessary)
 
 ---
 
 ## Color System
 
-**Semantic color tokens referencing Open Props**
+**Self-contained HSL color tokens**
 
-**Location:** `packages/ui/src/styles/variables.scss`
+**Location:** `packages/ui/src/styles/design-tokens.scss`
 
 **Categories:**
 
-- **Text colors:** `--color-text-default`, `--color-text-muted`, `--color-text-subtle`, `--color-text-inverted`
-- **Surface colors:** `--color-surface-base`, `--color-surface-subtle`, `--color-surface-strong`, `--color-surface-stronger`, `--color-surface-strongest`
-- **Accent colors:** `--color-primary`, `--color-accent`, `--color-accent-brighter`
+- **Base colors:** `--color-background`, `--color-foreground`
+- **Interactive colors:** `--color-primary`, `--color-destructive`, `--color-accent` (with foreground pairs)
+- **Utility colors:** `--color-border`, `--color-ring`, `--color-input`
 
 **Pattern:** Semantic naming (purpose-based, not value-based)
 
 ```scss
-// ✅ Use semantic tokens
+// ✅ Use semantic tokens directly
 .button {
-  background-color: var(--color-surface-base);
-  color: var(--color-text-default);
+  background: hsl(var(--color-primary));
+  color: hsl(var(--color-primary-foreground));
 }
 
-// ❌ Don't use Open Props directly
+// ❌ Don't hardcode colors
 .button {
-  background-color: var(--gray-0);
-  color: var(--gray-7);
+  background: hsl(221.2 83.2% 53.3%);
+  color: hsl(210 40% 98%);
 }
 ```
 
 ### Color Format Requirements
 
-**RGB format with CSS color functions**
+**HSL format with CSS color functions**
 
 **Rules:**
 
-- **Use RGB format for all colors:** `rgb(255 255 255)` instead of hex `#FFFFFF` or `rgba()`
+- **Store HSL values only in tokens:** `--primary: 221.2 83.2% 53.3%` (no `hsl()` wrapper)
+- **Wrap with hsl() at usage site:** `background: hsl(var(--primary))`
 - **Use CSS color functions for derived colors:**
-  - Transparency: `rgb(0 0 0 / var(--opacity-medium))` or `rgb(0 0 0 / 0.5)`
-  - Color mixing: `color-mix(in srgb, var(--color-primary), black 5%)`
-  - Modern space-separated syntax: `rgb(255 255 255 / 0.5)` NOT `rgba(255, 255, 255, 0.5)`
+  - Transparency: `hsl(var(--primary) / 0.5)` or `hsl(var(--primary) / var(--opacity-medium))`
+  - Color mixing: `color-mix(in srgb, var(--color-primary), white 10%)`
 - **Never use Sass color functions:** No `darken()`, `lighten()`, `transparentize()`, etc.
 - **Avoid hard-coding color values directly** in component styles
+- **Always use semantic color tokens** (not raw HSL values in components)
 
-**Why RGB format:**
+**Why HSL format:**
 
-- Better for design token systems and theming
-- Native CSS color functions work with RGB
-- Space-separated syntax enables CSS variable usage for opacity
-- Eliminates need for Sass color manipulation
+- Human-readable color values (hue, saturation, lightness)
+- Easy to create color variations (adjust lightness for hover states)
+- Space-separated syntax enables opacity modification via `/` operator
+- Natural for design token systems and theming
+- More intuitive than RGB for manual adjustments
 
-**Example:**
+**Usage Pattern:**
 
 ```scss
-// ✅ CORRECT: RGB with CSS color functions
+// ✅ CORRECT: HSL with wrapper at usage site
 .button {
-  background: rgb(255 255 255);
-  color: rgb(0 0 0 / 0.8); // 80% opacity
+  background: hsl(var(--color-primary));
+  color: hsl(var(--color-primary-foreground));
+
+  // With opacity
+  border: 1px solid hsl(var(--color-primary) / 0.5);
 
   &:hover {
     background: color-mix(in srgb, var(--color-primary), white 10%);
   }
 }
 
-// ❌ WRONG: Hex colors and Sass functions
-.button {
-  background: #ffffff;
-  color: rgba(0, 0, 0, 0.8);
+// ❌ WRONG: Hex colors, Sass functions, or hsl() in tokens
+:root {
+  --color-primary: hsl(221.2 83.2% 53.3%); // ❌ Don't wrap in token
+  --color-secondary: #3b82f6; // ❌ Don't use hex
+}
 
-  &:hover {
-    background: darken($primary-color, 10%); // Don't use Sass functions
-  }
+.button {
+  background: darken($primary-color, 10%); // ❌ Don't use Sass functions
+  color: rgba(0, 0, 0, 0.8); // ❌ Don't use rgba
 }
 ```
 
 **RED FLAGS:**
 
 - ❌ Using hex colors (`#FFFFFF`, `#000000`)
-- ❌ Using comma-separated rgba syntax (`rgba(0, 0, 0, 0.5)`)
 - ❌ Using Sass color functions (`darken`, `lighten`, `transparentize`)
 - ❌ Hard-coding color values instead of using design tokens
+- ❌ Using RGB format (we use HSL for consistency)
 
 ---
 
@@ -207,13 +262,233 @@ h1 {
 
 ## Theme Implementation
 
-**CURRENT STATUS: Not implemented**
+**Class-based theming with `.dark` class**
 
-- No light/dark mode switching
-- No ThemeProvider in codebase
-- Design tokens defined in `:root` only
+### Dark Mode Pattern
 
-**Future consideration:** If theme switching is needed, use data-attributes or CSS classes to swap token values
+**Implementation:** Use `.dark` class on root element to override all color tokens
+
+```scss
+// packages/ui/src/styles/variables.scss
+
+// Light mode (default)
+:root {
+  --color-background: 0 0% 100%;
+  --color-foreground: 222.2 84% 4.9%;
+
+  --color-primary: 221.2 83.2% 53.3%;
+  --color-primary-foreground: 210 40% 98%;
+
+  --color-card: 0 0% 100%;
+  --color-card-foreground: 222.2 84% 4.9%;
+
+  --color-destructive: 0 84.2% 60.2%;
+  --color-destructive-foreground: 210 40% 98%;
+
+  --color-border: 214.3 31.8% 91.4%;
+  --color-ring: 221.2 83.2% 53.3%;
+}
+
+// Dark mode (override)
+.dark {
+  --color-background: 222.2 84% 4.9%;
+  --color-foreground: 210 40% 98%;
+
+  --color-primary: 217.2 91.2% 59.8%;
+  --color-primary-foreground: 222.2 47.4% 11.2%;
+
+  --color-card: 222.2 84% 4.9%;
+  --color-card-foreground: 210 40% 98%;
+
+  --color-destructive: 0 62.8% 30.6%;
+  --color-destructive-foreground: 210 40% 98%;
+
+  --color-border: 217.2 32.6% 17.5%;
+  --color-ring: 224.3 76.3% 48%;
+}
+```
+
+**Theme Toggle:**
+
+```typescript
+// Toggle dark mode
+const toggleDarkMode = () => {
+  document.documentElement.classList.toggle("dark");
+};
+
+// Set dark mode
+const setDarkMode = (isDark: boolean) => {
+  if (isDark) {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
+};
+
+// Persist preference
+const toggleDarkMode = () => {
+  const isDark = document.documentElement.classList.toggle("dark");
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+};
+
+// Initialize from localStorage
+const initTheme = () => {
+  const theme = localStorage.getItem("theme");
+  if (theme === "dark") {
+    document.documentElement.classList.add("dark");
+  }
+};
+```
+
+**Component Usage (theme-agnostic):**
+
+```scss
+// Component never references theme directly
+.button {
+  background: hsl(var(--color-primary));
+  color: hsl(var(--color-primary-foreground));
+
+  // Automatically adapts to light/dark mode
+  // No conditional logic needed
+}
+```
+
+**RED FLAGS:**
+
+- ❌ Theme logic in components
+- ❌ Conditional className based on theme
+- ❌ JavaScript-based theme switching in components
+- ❌ Not defining dark mode overrides for all color tokens
+
+---
+
+## SCSS Mixins Library
+
+**Reusable SCSS mixins for common patterns**
+
+**Location:** `packages/ui/src/styles/mixins.scss`
+
+### Standard Mixins
+
+```scss
+// mixins.scss
+
+// Focus ring styling
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid hsl(var(--color-ring));
+    outline-offset: 2px;
+  }
+}
+
+// Disabled state
+@mixin disabled-state {
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Smooth transitions
+@mixin transition-colors {
+  transition: var(--transition-colors);
+}
+
+// Truncate text
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Visually hidden (for screen readers)
+@mixin sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+```
+
+### When to Create Mixins
+
+**Create mixins for:**
+
+- ✅ Patterns used in 3+ components
+- ✅ Complex CSS that's hard to remember
+- ✅ Accessibility patterns (focus, sr-only)
+- ✅ Browser-specific workarounds
+
+**Don't create mixins for:**
+
+- ❌ Simple one-liners better as design tokens
+- ❌ Component-specific styles
+- ❌ One-off patterns
+
+**RED FLAGS:**
+
+- ❌ Not using mixins for focus states (inconsistent accessibility)
+- ❌ Duplicating complex patterns across components
+- ❌ Reinventing mixins that already exist
+
+---
+
+## Global Styles Organization
+
+**File structure for global styles**
+
+**Location:** `packages/ui/src/styles/`
+
+```
+packages/ui/src/styles/
+├── design-tokens.scss   # All design tokens (colors, spacing, typography)
+├── mixins.scss          # Reusable SCSS mixins
+├── global.scss          # Global base styles with import order
+├── reset.scss           # CSS reset
+└── utility-classes.scss # Minimal utility classes
+```
+
+### Utility Classes (Minimal)
+
+**Pattern:** Small set of utilities, not comprehensive like Tailwind
+
+```scss
+// utility-classes.scss
+
+// Screen reader only
+.sr-only {
+  @include sr-only;
+}
+
+// Focus ring
+.focus-ring {
+  @include focus-ring;
+}
+
+// Truncate text
+.truncate {
+  @include truncate;
+}
+```
+
+**Philosophy:**
+
+- Minimal set (not comprehensive)
+- Common patterns only
+- Extracted from mixins
+- Used sparingly in components
+
+**RED FLAGS:**
+
+- ❌ Creating comprehensive utility library (use Tailwind instead)
+- ❌ Using utilities instead of component styles
+- ❌ Not extracting utilities from mixins
 
 ---
 
@@ -242,141 +517,150 @@ import styles from "./button.module.scss";
 
 ## Component Architecture
 
-**Four-tier hierarchy with cva for variants**
-
-**Hierarchy:**
+**Tiered component hierarchy**
 
 1. **Primitives** (`src/primitives/`) - Low-level building blocks (skeleton)
-2. **Components** (`src/components/`) - Reusable UI (button, switch, select, info)
-3. **Patterns** (`src/patterns/`) - Higher-level patterns (feature, navigation, socials)
-4. **Templates** (`src/templates/`) - Page templates and layouts (frame)
-
-**Pattern:** Use `class-variance-authority` (cva) for type-safe variant management
+2. **Components** (`src/components/`) - Reusable UI (button, switch, select)
+3. **Patterns** (`src/patterns/`) - Composed patterns (feature, navigation)
+4. **Templates** (`src/templates/`) - Page layouts (frame)
 
 **Key practices:**
 
-- Functional components with TypeScript
 - Use `cva` ONLY when component has multiple variants
-- Ref forwarding with `forwardRef` for interactive components
-- Expose `className` prop for customization
-- Use `asChild` pattern for polymorphic components (design system components)
+- Ref forwarding with `forwardRef`
+- Expose `className` prop
+- Use `asChild` pattern for polymorphic components
 
 ---
 
-## Component Structure Standards
+## Component SCSS Module Structure
 
-**Structure components with semantic classes and logical nesting**
+**Consistent structure across all components**
+
+**Pattern:** Import → Base → Variants → Sizes
+
+```scss
+// button.module.scss
+
+// ============================================
+// IMPORTS
+// ============================================
+@import "../../styles/design-tokens.scss";
+@import "../../styles/mixins.scss";
+
+// ============================================
+// BASE CLASS
+// ============================================
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+
+  // Use design tokens directly (no redeclaration)
+  border-radius: var(--radius);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: var(--transition-colors);
+
+  // Use mixins for common patterns
+  @include focus-ring;
+  @include disabled-state;
+  @include transition-colors;
+}
+
+// ============================================
+// VARIANT CLASSES
+// ============================================
+.default {
+  background: hsl(var(--color-primary));
+  color: hsl(var(--color-primary-foreground));
+
+  &:hover {
+    background: hsl(var(--color-primary) / 0.9);
+  }
+}
+
+.destructive {
+  background: hsl(var(--color-destructive));
+  color: hsl(var(--color-destructive-foreground));
+
+  &:hover {
+    background: hsl(var(--color-destructive) / 0.9);
+  }
+}
+
+.ghost {
+  background: transparent;
+
+  &:hover {
+    background: hsl(var(--color-accent));
+    color: hsl(var(--color-accent-foreground));
+  }
+}
+
+// ============================================
+// SIZE CLASSES
+// ============================================
+.sm {
+  height: 2.25rem;
+  padding: 0.5rem 0.75rem;
+  font-size: var(--font-size-xs);
+}
+
+.lg {
+  height: 2.75rem;
+  padding: 0.5rem 2rem;
+}
+
+.icon {
+  height: 2.5rem;
+  width: 2.5rem;
+  padding: 0;
+}
+```
 
 **Key Principles:**
 
-- Use design tokens directly from `variables.scss` in component styles
-- Create component-specific variables ONLY when they add value (see criteria below)
-- Define component variables at the top using `--component-[property]` naming format
-- Structure components with logical nesting and clear separation of parts
-- Use semantic class names that describe purpose, not appearance (e.g., `.submitButton` not `.blueButton`)
-- Use data-attributes for state-based styling: `&[data-state="open"]`, `&[data-active="true"]`
+- **Import design tokens and mixins at top**
+- **Use design tokens directly** - No redeclaration as component variables
+- **Use mixins for common patterns** - focus-ring, disabled-state, etc.
+- **Section comments for organization** - Clear visual hierarchy
+- **Semantic class names** - Purpose, not appearance (`.submitButton` not `.blueButton`)
+- **Data-attributes for state** - `&[data-state="open"]`, `&[data-active="true"]`
+- **BEM-like naming within modules** - But scoped by CSS Modules
 
-**Example:**
+**Component Variables (Rarely Needed):**
 
-```scss
-.modal {
-  // Component variables defined at top
-  --modal-width: 600px;
-  --modal-padding: var(--space-lg);
-
-  // Base styles using design tokens
-  width: var(--modal-width);
-  padding: var(--modal-padding);
-  background: var(--color-surface-base);
-  border-radius: var(--radius-sm);
-
-  // Nested elements with semantic names
-  .modalHeader {
-    padding-bottom: var(--space-md);
-    border-bottom: 1px solid var(--color-surface-subtle);
-  }
-
-  .modalTitle {
-    font-size: var(--text-size-heading);
-    color: var(--color-text-default);
-  }
-
-  // State-based styling with data-attributes
-  &[data-state="open"] {
-    display: block;
-  }
-
-  &[data-state="closed"] {
-    display: none;
-  }
-}
-```
-
----
-
-## Component-Specific Variables
-
-**GUIDANCE: Create component variables only when they add value**
-
-**✅ CREATE variables for:**
-
-- Values used multiple times within the component
-- Values that change based on variants/states (sizes, themes)
-- Complex calculated values that would be repeated
-- Values that might need runtime modification via JavaScript
-- Component-specific sizing systems (e.g., avatar sizes: sm, md, lg, xl)
-
-**❌ DON'T CREATE variables for:**
-
-- Simple, single-use values like `1px`, `2px` for borders
-- Standard font-weights like `600`, `500` used once
-- Values that already exist as design tokens (avoid redeclaration)
-- One-off calculations that aren't reused
-
-**Naming Convention:** Use `--component-[property]` format (e.g., `--button-padding`, `--modal-width`)
-
-**Example of good usage:**
+Components should use design tokens directly. Only create component-specific variables for:
 
 ```scss
-// Component with variants - variables make sense
-.component {
-  --component-size-sm: 2rem;
-  --component-size-md: 3rem;
-  --component-size-lg: 4rem;
+// ✅ RARE CASE: Variant-specific sizing that doesn't exist in design tokens
+.avatar {
+  // Only when variants need specific sizes not in design tokens
+  --avatar-size-sm: 2rem;
+  --avatar-size-md: 3rem;
+  --avatar-size-lg: 4rem;
+  --avatar-size-xl: 5rem;
 }
 
 .sizeSm {
-  width: var(--component-size-sm);
+  width: var(--avatar-size-sm);
+  height: var(--avatar-size-sm);
 }
 .sizeMd {
-  width: var(--component-size-md);
-}
-.sizeLg {
-  width: var(--component-size-lg);
-}
-```
-
-**Example of unnecessary variables:**
-
-```scss
-// ❌ Don't do this
-.component {
-  --component-border-width: 1px; // Used only once
-  border: var(--component-border-width) solid;
-}
-
-// ✅ Do this instead
-.component {
-  border: 1px solid var(--color-surface-subtle);
+  width: var(--avatar-size-md);
+  height: var(--avatar-size-md);
 }
 ```
 
 **RED FLAGS:**
 
-- ❌ Redeclaring existing design tokens as component variables
-- ❌ Creating variables for every single value in a component
-- ❌ Using non-standard naming conventions (use `--component-[property]`)
-- ❌ Defining variables inline instead of at the top of the component
+- ❌ Redeclaring design tokens as component variables (`--button-radius: var(--radius)`)
+- ❌ Creating variables for values used once
+- ❌ Not using mixins for common patterns (focus, disabled states)
+- ❌ Missing import of design-tokens and mixins
+- ❌ No section comments for organization
 
 ---
 
